@@ -3,26 +3,527 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Startpage</title>
-    <link rel="stylesheet" href="/css/stylesstartpage.css">
+    <title>Ina — Drive to Portfolio</title>
+    <style>
+
+        /* ── RESET & BASE ── */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background: #87CEEB;
+            font-family: 'Segoe UI', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* ── TOP BAR ── */
+        #topbar {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 30px;
+            background: rgba(255,255,255,0.3);
+            backdrop-filter: blur(8px);
+            z-index: 10;
+        }
+
+        #logo {
+            font-size: 28px;
+            font-weight: 900;
+            color: #1a1a2e;
+            letter-spacing: -1px;
+        }
+
+        #logo span {
+            color: #7b61ff;
+        }
+
+        #score-display {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1a1a2e;
+        }
+
+        /* ── GAME CANVAS ── */
+        #gameCanvas {
+            display: block;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+            cursor: none;
+        }
+
+        /* ── OVERLAY SCREENS ── */
+        .screen {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 20;
+            background: rgba(11, 12, 30, 0.85);
+            backdrop-filter: blur(6px);
+        }
+
+        .screen h1 {
+            font-size: 48px;
+            color: #c8f03a;
+            margin-bottom: 12px;
+            letter-spacing: -1px;
+        }
+
+        .screen p {
+            font-size: 18px;
+            color: #aaa;
+            margin-bottom: 32px;
+            text-align: center;
+            max-width: 360px;
+            line-height: 1.6;
+        }
+
+        .btn {
+            background: #c8f03a;
+            color: #0b0c10;
+            border: none;
+            padding: 16px 42px;
+            border-radius: 6px;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            letter-spacing: 0.04em;
+            text-decoration: none;
+        }
+
+        .btn:hover {
+            background: #deff4f;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 24px rgba(200,240,58,0.4);
+        }
+
+        .btn-ghost {
+            background: transparent;
+            border: 2px solid #7b61ff;
+            color: #7b61ff;
+            margin-top: 14px;
+        }
+
+        .btn-ghost:hover {
+            background: #7b61ff;
+            color: #fff;
+        }
+
+        /* ── CONTROLS HINT ── */
+        #controls-hint {
+            position: fixed;
+            bottom: 18px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 13px;
+            color: rgba(255,255,255,0.6);
+            z-index: 10;
+            letter-spacing: 0.05em;
+        }
+
+        /* ── WIN SCREEN PORTFOLIO LINK ── */
+        #win-screen .score-final {
+            font-size: 22px;
+            color: #c8f03a;
+            margin-bottom: 28px;
+            font-weight: 700;
+        }
+
+    </style>
 </head>
 <body>
-    <header class="head">
-        <div class="logo">
-            <img src="images/removed background logo.png" alt="Logo" width="100%" height="80%" style="padding-top: 10px;"> 
-        </div>
-        <div class="linkbutton">
-            <p style="margin: 35px 50px 0 0; font-family: Salsa; font-size: 21px;">Press <a href="trial.html" target="_blank" style="font-weight: bold; text-decoration: none;">here</a> to view my portfolio</p>
-        </div>
-    </header>
-    <main>
-        <div class="highway">
-        </div>
-        <div class="city">
-        </div>
-        <div class="car">
-            <img src="/images/car.png" width="100%">
-        </div>
-    </main>
+
+    <!-- TOP BAR -->
+    <div id="topbar">
+        <div id="logo">ina<span>.</span></div>
+        <div id="score-display">⭐ Stars: <span id="live-score">0</span> / 10</div>
+    </div>
+
+    <!-- CANVAS -->
+    <canvas id="gameCanvas"></canvas>
+
+    <!-- CONTROLS HINT -->
+    <div id="controls-hint">← → Arrow Keys &nbsp;|&nbsp; A D Keys &nbsp;|&nbsp; Touch to steer</div>
+
+    <!-- START SCREEN -->
+    <div class="screen" id="start-screen">
+        <h1>🚗 Drive!</h1>
+        <p>Collect <strong style="color:#c8f03a;">10 stars ⭐</strong> to unlock my portfolio.<br>Dodge the traffic cones 🚧 or you'll lose a life!</p>
+        <button class="btn" onclick="startGame()">Start Driving</button>
+    </div>
+
+    <!-- GAME OVER SCREEN -->
+    <div class="screen" id="gameover-screen" style="display:none;">
+        <h1>💥 Oops!</h1>
+        <p>You hit too many cones. Better luck next time!</p>
+        <button class="btn" onclick="startGame()">Try Again</button>
+    </div>
+
+    <!-- WIN SCREEN -->
+    <div class="screen" id="win-screen" style="display:none;">
+        <h1>🎉 You Win!</h1>
+        <p class="score-final">You collected all 10 stars!</p>
+        <p>The portfolio is now unlocked. Ready to see what I've built?</p>
+        <a href="trial.html" class="btn">View My Portfolio →</a>
+        <button class="btn btn-ghost" onclick="startGame()">Play Again</button>
+    </div>
+
+    <script>
+
+        // ──────────────────────────────────────────
+        //  SETUP
+        // ──────────────────────────────────────────
+
+        const canvas  = document.getElementById('gameCanvas');
+        const ctx     = canvas.getContext('2d');
+
+        // Make canvas fill most of the screen
+        canvas.width  = Math.min(480, window.innerWidth  - 40);
+        canvas.height = Math.min(680, window.innerHeight - 80);
+
+        const W = canvas.width;
+        const H = canvas.height;
+
+        // Road lane positions (3 lanes)
+        const LANES    = 3;
+        const LANE_W   = W / LANES;
+
+        // ──────────────────────────────────────────
+        //  GAME STATE
+        // ──────────────────────────────────────────
+
+        let car, obstacles, stars, lives, score;
+        let gameRunning = false;
+        let roadOffset  = 0;        // for road scrolling animation
+        let speed       = 4;        // obstacle fall speed
+        let frameCount  = 0;
+
+        // ──────────────────────────────────────────
+        //  INIT / RESET
+        // ──────────────────────────────────────────
+
+        function startGame() {
+            hideAllScreens();
+
+            car = {
+                lane: 1,                        // 0 = left, 1 = centre, 2 = right
+                x: laneX(1),
+                y: H - 120,
+                w: 44,
+                h: 80,
+                moving: false
+            };
+
+            obstacles = [];
+            stars     = [];
+            lives     = 3;
+            score     = 0;
+            speed     = 4;
+            frameCount = 0;
+
+            document.getElementById('live-score').textContent = score;
+
+            gameRunning = true;
+            requestAnimationFrame(gameLoop);
+        }
+
+        // Centre x of a lane
+        function laneX(lane) {
+            return lane * LANE_W + LANE_W / 2;
+        }
+
+        // ──────────────────────────────────────────
+        //  KEYBOARD INPUT
+        // ──────────────────────────────────────────
+
+        document.addEventListener('keydown', (e) => {
+            if (!gameRunning) return;
+            if (e.key === 'ArrowLeft'  || e.key === 'a') moveCar(-1);
+            if (e.key === 'ArrowRight' || e.key === 'd') moveCar(+1);
+        });
+
+        // Touch / swipe for mobile
+        let touchStartX = 0;
+        canvas.addEventListener('touchstart', (e) => { touchStartX = e.touches[0].clientX; });
+        canvas.addEventListener('touchend',   (e) => {
+            const dx = e.changedTouches[0].clientX - touchStartX;
+            if (!gameRunning) return;
+            if (dx < -30) moveCar(-1);
+            if (dx >  30) moveCar(+1);
+        });
+
+        function moveCar(dir) {
+            car.lane = Math.max(0, Math.min(2, car.lane + dir));
+            car.x    = laneX(car.lane);
+        }
+
+        // ──────────────────────────────────────────
+        //  SPAWNING
+        // ──────────────────────────────────────────
+
+        function spawnObstacle() {
+            const lane = Math.floor(Math.random() * LANES);
+            obstacles.push({ lane, x: laneX(lane), y: -60, w: 40, h: 50 });
+        }
+
+        function spawnStar() {
+            const lane = Math.floor(Math.random() * LANES);
+            stars.push({ lane, x: laneX(lane), y: -30, r: 14 });
+        }
+
+        // ──────────────────────────────────────────
+        //  DRAWING HELPERS
+        // ──────────────────────────────────────────
+
+        function drawRoad() {
+            // Sky gradient
+            const sky = ctx.createLinearGradient(0, 0, 0, H);
+            sky.addColorStop(0, '#87CEEB');
+            sky.addColorStop(1, '#b0e0ff');
+            ctx.fillStyle = sky;
+            ctx.fillRect(0, 0, W, H);
+
+            // Road surface
+            ctx.fillStyle = '#555';
+            ctx.fillRect(0, 0, W, H);
+
+            // Lane markings
+            ctx.strokeStyle = '#fff';
+            ctx.lineWidth   = 3;
+            ctx.setLineDash([40, 30]);
+            ctx.lineDashOffset = -roadOffset;
+
+            for (let i = 1; i < LANES; i++) {
+                ctx.beginPath();
+                ctx.moveTo(i * LANE_W, 0);
+                ctx.lineTo(i * LANE_W, H);
+                ctx.stroke();
+            }
+            ctx.setLineDash([]);
+
+            // Road edges
+            ctx.strokeStyle = '#fff';
+            ctx.lineWidth   = 5;
+            ctx.beginPath(); ctx.moveTo(4, 0);   ctx.lineTo(4, H);   ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(W-4, 0); ctx.lineTo(W-4, H); ctx.stroke();
+        }
+
+        function drawCar() {
+            const x = car.x;
+            const y = car.y;
+            const w = car.w;
+            const h = car.h;
+
+            // Body
+            ctx.fillStyle = '#e74c3c';
+            ctx.beginPath();
+            ctx.roundRect(x - w/2, y - h/2, w, h, 8);
+            ctx.fill();
+
+            // Roof / windshield
+            ctx.fillStyle = '#c0392b';
+            ctx.beginPath();
+            ctx.roundRect(x - w/2 + 5, y - h/2 + 10, w - 10, h * 0.45, 6);
+            ctx.fill();
+
+            // Windshield glass
+            ctx.fillStyle = 'rgba(180,220,255,0.7)';
+            ctx.beginPath();
+            ctx.roundRect(x - w/2 + 8, y - h/2 + 13, w - 16, 22, 4);
+            ctx.fill();
+
+            // Rear window
+            ctx.fillStyle = 'rgba(180,220,255,0.5)';
+            ctx.beginPath();
+            ctx.roundRect(x - w/2 + 8, y - h/2 + 40, w - 16, 14, 4);
+            ctx.fill();
+
+            // Wheels (4)
+            const wheelPositions = [
+                [x - w/2 - 5, y - h/2 + 8],
+                [x + w/2 - 7, y - h/2 + 8],
+                [x - w/2 - 5, y + h/2 - 22],
+                [x + w/2 - 7, y + h/2 - 22],
+            ];
+            ctx.fillStyle = '#1a1a2e';
+            wheelPositions.forEach(([wx, wy]) => {
+                ctx.beginPath();
+                ctx.roundRect(wx, wy, 12, 18, 4);
+                ctx.fill();
+            });
+
+            // Headlights
+            ctx.fillStyle = '#fffacd';
+            ctx.beginPath(); ctx.arc(x - w/2 + 6, y + h/2 - 6, 5, 0, Math.PI*2); ctx.fill();
+            ctx.beginPath(); ctx.arc(x + w/2 - 6, y + h/2 - 6, 5, 0, Math.PI*2); ctx.fill();
+        }
+
+        function drawObstacle(o) {
+            // Traffic cone
+            const cx = o.x;
+            const cy = o.y;
+
+            // Base
+            ctx.fillStyle = '#e67e22';
+            ctx.beginPath();
+            ctx.moveTo(cx - o.w/2, cy + o.h/2);
+            ctx.lineTo(cx + o.w/2, cy + o.h/2);
+            ctx.lineTo(cx + 8,     cy - o.h/2);
+            ctx.lineTo(cx - 8,     cy - o.h/2);
+            ctx.closePath();
+            ctx.fill();
+
+            // Stripes
+            ctx.fillStyle = '#fff';
+            ctx.fillRect(cx - o.w/2 + 4, cy, o.w - 8, 7);
+        }
+
+        function drawStar(s) {
+            ctx.save();
+            ctx.translate(s.x, s.y);
+            ctx.fillStyle = '#f1c40f';
+
+            // Simple star shape
+            ctx.beginPath();
+            for (let i = 0; i < 5; i++) {
+                const outerAngle = (i * 4 * Math.PI / 5) - Math.PI / 2;
+                const innerAngle = outerAngle + (2 * Math.PI / 10);
+                const outer = s.r;
+                const inner = s.r * 0.4;
+                if (i === 0) {
+                    ctx.moveTo(Math.cos(outerAngle) * outer, Math.sin(outerAngle) * outer);
+                } else {
+                    ctx.lineTo(Math.cos(outerAngle) * outer, Math.sin(outerAngle) * outer);
+                }
+                ctx.lineTo(Math.cos(innerAngle) * inner, Math.sin(innerAngle) * inner);
+            }
+            ctx.closePath();
+            ctx.fill();
+
+            // Glow
+            ctx.shadowColor = '#f1c40f';
+            ctx.shadowBlur  = 12;
+            ctx.fill();
+
+            ctx.restore();
+        }
+
+        function drawHUD() {
+            // Lives (hearts)
+            ctx.font = '22px serif';
+            for (let i = 0; i < lives; i++) {
+                ctx.fillText('❤️', 10 + i * 28, 36);
+            }
+        }
+
+        // ──────────────────────────────────────────
+        //  COLLISION  (simple bounding box)
+        // ──────────────────────────────────────────
+
+        function rectsOverlap(ax, ay, aw, ah, bx, by, bw, bh) {
+            return ax < bx + bw &&
+                   ax + aw > bx &&
+                   ay < by + bh &&
+                   ay + ah > by;
+        }
+
+        // ──────────────────────────────────────────
+        //  MAIN GAME LOOP
+        // ──────────────────────────────────────────
+
+        function gameLoop() {
+            if (!gameRunning) return;
+
+            frameCount++;
+
+            // Speed up slightly over time
+            if (frameCount % 300 === 0) speed = Math.min(speed + 0.5, 12);
+
+            // Scroll road markings
+            roadOffset = (roadOffset + speed) % 70;
+
+            // Spawn things
+            if (frameCount % 70 === 0)  spawnObstacle();
+            if (frameCount % 90 === 0)  spawnStar();
+
+            // Move obstacles
+            obstacles.forEach(o => o.y += speed);
+            obstacles = obstacles.filter(o => o.y < H + 80);
+
+            // Move stars
+            stars.forEach(s => s.y += speed * 0.8);
+            stars = stars.filter(s => s.y < H + 40);
+
+            // ── COLLISION: obstacles ──
+            obstacles = obstacles.filter(o => {
+                const hit = rectsOverlap(
+                    car.x - car.w/2, car.y - car.h/2, car.w, car.h,
+                    o.x   - o.w/2,   o.y   - o.h/2,  o.w,  o.h
+                );
+                if (hit) {
+                    lives--;
+                    if (lives <= 0) {
+                        gameRunning = false;
+                        showScreen('gameover-screen');
+                    }
+                    return false;   // remove cone
+                }
+                return true;
+            });
+
+            // ── COLLISION: stars ──
+            stars = stars.filter(s => {
+                const hit = rectsOverlap(
+                    car.x - car.w/2, car.y - car.h/2, car.w, car.h,
+                    s.x - s.r, s.y - s.r, s.r*2, s.r*2
+                );
+                if (hit) {
+                    score++;
+                    document.getElementById('live-score').textContent = score;
+                    if (score >= 10) {
+                        gameRunning = false;
+                        showScreen('win-screen');
+                    }
+                    return false;   // remove star
+                }
+                return true;
+            });
+
+            // ── DRAW ──
+            drawRoad();
+            stars.forEach(drawStar);
+            obstacles.forEach(drawObstacle);
+            drawCar();
+            drawHUD();
+
+            requestAnimationFrame(gameLoop);
+        }
+
+        // ──────────────────────────────────────────
+        //  SCREEN HELPERS
+        // ──────────────────────────────────────────
+
+        function hideAllScreens() {
+            ['start-screen','gameover-screen','win-screen'].forEach(id => {
+                document.getElementById(id).style.display = 'none';
+            });
+        }
+
+        function showScreen(id) {
+            hideAllScreens();
+            document.getElementById(id).style.display = 'flex';
+        }
+
+    </script>
 </body>
 </html>
