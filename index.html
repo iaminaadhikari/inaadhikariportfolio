@@ -4,11 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ina — Drive to Portfolio</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
+
         body {
-            background: #87CEEB;
-            font-family: 'Segoe UI', sans-serif;
+            background: #0b0c10;
+            font-family: 'DM Sans', sans-serif;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -16,6 +18,8 @@
             height: 100vh;
             overflow: hidden;
         }
+
+        /* ── TOPBAR ── */
         #topbar {
             position: fixed;
             top: 0; left: 0; right: 0;
@@ -23,25 +27,35 @@
             justify-content: space-between;
             align-items: center;
             padding: 10px 24px;
-            background: rgba(255,255,255,0.25);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(255,255,255,0.4);
+            background: rgba(10, 11, 16, 0.97);
+            backdrop-filter: blur(14px);
+            border-bottom: 1px solid rgba(200, 240, 58, 0.2);
             z-index: 10;
         }
+
         #score-pill {
-            background: rgba(255,255,255,0.6);
+            background: rgba(200, 240, 58, 0.08);
+            border: 1px solid rgba(200, 240, 58, 0.3);
             border-radius: 20px;
-            padding: 4px 14px;
-            font-size: 15px;
+            padding: 5px 16px;
+            font-family: 'Space Mono', monospace;
+            font-size: 13px;
             font-weight: 700;
-            color: #1a1a2e;
-            border: 1px solid rgba(255,255,255,0.8);
+            color: #c8f03a;
+            letter-spacing: 0.05em;
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
+
         canvas {
             display: block;
-            border-radius: 14px;
-            border: 2px solid rgba(255,255,255,0.5);
+            border-radius: 16px;
+            border: 1px solid rgba(200, 240, 58, 0.12);
+            box-shadow: 0 0 60px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.04);
         }
+
+        /* ── OVERLAY SCREENS ── */
         .screen {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
@@ -50,75 +64,262 @@
             align-items: center;
             justify-content: center;
             z-index: 20;
-            background: rgba(8,10,24,0.88);
-            backdrop-filter: blur(8px);
+            background: rgba(7, 8, 14, 0.93);
+            backdrop-filter: blur(14px);
+            padding: 20px;
         }
-        .screen h1 { font-size: 44px; color: #c8f03a; margin-bottom: 10px; letter-spacing: -1px; }
-        .screen p  { font-size: 17px; color: #bbb; margin-bottom: 28px; text-align: center; max-width: 340px; line-height: 1.65; }
+
+        .screen-card {
+            background: #13141a;
+            border: 1px solid #252831;
+            border-radius: 20px;
+            padding: 44px 36px 36px;
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 32px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.04);
+            position: relative;
+        }
+
+        .screen-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 24px; right: 24px;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(200,240,58,0.5), transparent);
+        }
+
+        .screen-badge {
+            display: inline-block;
+            font-family: 'Space Mono', monospace;
+            font-size: 10px;
+            letter-spacing: 0.15em;
+            color: #c8f03a;
+            background: rgba(200,240,58,0.08);
+            border: 1px solid rgba(200,240,58,0.2);
+            border-radius: 20px;
+            padding: 4px 12px;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+
+        .screen h1 {
+            font-family: 'Space Mono', monospace;
+            font-size: 26px;
+            color: #e8eaf0;
+            margin-bottom: 10px;
+            letter-spacing: -0.5px;
+            line-height: 1.2;
+        }
+
+        .screen p {
+            font-size: 14px;
+            color: #6b7280;
+            margin-bottom: 24px;
+            line-height: 1.7;
+        }
+
+        /* ── GAME INFO PILLS ── */
+        .game-info {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 24px;
+        }
+
+        .info-pill {
+            flex: 1;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid #252831;
+            border-radius: 10px;
+            padding: 12px 8px;
+            text-align: center;
+        }
+
+        .info-pill .pill-val {
+            display: block;
+            font-family: 'Space Mono', monospace;
+            font-size: 18px;
+            color: #e8eaf0;
+            font-weight: 700;
+            line-height: 1;
+            margin-bottom: 4px;
+        }
+
+        .info-pill .pill-val.accent { color: #c8f03a; }
+
+        .info-pill .pill-label {
+            display: block;
+            font-size: 10px;
+            color: #4b5563;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        /* ── BUTTONS ── */
         .btn {
             background: #c8f03a;
             color: #0b0c10;
             border: none;
-            padding: 15px 40px;
-            border-radius: 6px;
-            font-size: 17px;
+            padding: 14px 24px;
+            border-radius: 8px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 15px;
             font-weight: 700;
             cursor: pointer;
-            transition: all .2s;
-            letter-spacing: .03em;
+            transition: all 0.2s;
+            letter-spacing: 0.02em;
             text-decoration: none;
-            display: inline-block;
+            display: block;
+            width: 100%;
+            text-align: center;
         }
-        .btn:hover { background: #deff4f; transform: translateY(-3px); }
-        .btn-ghost {
+
+        .btn:hover {
+            background: #deff4f;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(200,240,58,0.25);
+        }
+
+        .btn:active { transform: translateY(0); }
+
+        .btn-outline {
             background: transparent;
-            border: 2px solid #7b61ff;
-            color: #7b61ff;
-            margin-top: 12px;
-            display: inline-block;
+            border: 1px solid #252831;
+            color: #9ca3af;
+            margin-top: 10px;
         }
-        .btn-ghost:hover { background: #7b61ff; color: #fff; }
+
+        .btn-outline:hover {
+            border-color: #7b61ff;
+            color: #a78bfa;
+            background: rgba(123,97,255,0.06);
+            box-shadow: none;
+        }
+
+        .btn-portfolio {
+            background: transparent;
+            border: 1px solid rgba(200,240,58,0.25);
+            color: #c8f03a;
+            margin-top: 10px;
+        }
+
+        .btn-portfolio:hover {
+            background: rgba(200,240,58,0.06);
+            border-color: #c8f03a;
+            box-shadow: none;
+        }
+
+        .skip-link {
+            display: inline-block;
+            margin-top: 20px;
+            font-size: 12px;
+            color: #374151;
+            text-decoration: none;
+            font-family: 'Space Mono', monospace;
+            letter-spacing: 0.06em;
+            transition: color 0.2s;
+        }
+
+        .skip-link:hover { color: #6b7280; }
+
+        .score-hi {
+            font-family: 'Space Mono', monospace;
+            color: #c8f03a;
+            font-weight: 700;
+        }
+
+        /* ── CONTROLS HINT ── */
         #controls-hint {
             position: fixed;
-            bottom: 14px;
+            bottom: 12px;
             left: 50%;
             transform: translateX(-50%);
-            font-size: 12px;
-            color: rgba(255,255,255,0.55);
+            font-family: 'Space Mono', monospace;
+            font-size: 10px;
+            color: rgba(255,255,255,0.18);
             z-index: 10;
-            letter-spacing: .06em;
+            letter-spacing: 0.08em;
             white-space: nowrap;
+        }
+
+        /* ── LIVES DISPLAY ── */
+        .lives-row {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .live-dot {
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            background: #ef4444;
         }
     </style>
 </head>
 <body>
 
     <div id="topbar">
-        <!-- YOUR REAL LOGO -->
-        <img src="images/removed background logo.png" alt="ina logo" style="height:44px; object-fit:contain;">
-        <div id="score-pill">⭐ <span id="live-score">0</span> / 10</div>
+        <img src="images/removed background logo.png" alt="ina" style="height: 38px; object-fit: contain;">
+        <div id="score-pill">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="#c8f03a"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg>
+            <span id="live-score">0</span> / 10
+        </div>
     </div>
 
     <canvas id="gameCanvas"></canvas>
-    <div id="controls-hint">← → Arrow Keys &nbsp;|&nbsp; A D Keys &nbsp;|&nbsp; Swipe to steer</div>
+    <div id="controls-hint">← → Arrow Keys &nbsp;·&nbsp; A D Keys &nbsp;·&nbsp; Swipe to steer</div>
 
+    <!-- START SCREEN -->
     <div class="screen" id="start-screen">
-        <h1>🚗 Drive!</h1>
-        <p>Collect <strong style="color:#c8f03a">10 stars ⭐</strong> to unlock my portfolio.<br>Dodge the traffic cones 🚧 — you have 3 lives!</p>
-        <button class="btn" onclick="startGame()">Start Driving</button>
+        <div class="screen-card">
+            <span class="screen-badge">Interactive Intro</span>
+            <h1>Drive to<br>Portfolio</h1>
+            <p>Collect 10 stars to unlock Ina's portfolio.<br>Dodge the traffic cones — you have 3 lives!</p>
+            <div class="game-info">
+                <div class="info-pill">
+                    <span class="pill-val accent">10</span>
+                    <span class="pill-label">Stars</span>
+                </div>
+                <div class="info-pill">
+                    <span class="pill-val">3</span>
+                    <span class="pill-label">Lives</span>
+                </div>
+                <div class="info-pill">
+                    <span class="pill-val">🚧</span>
+                    <span class="pill-label">Dodge</span>
+                </div>
+            </div>
+            <button class="btn" onclick="startGame()">Start Driving</button>
+            <a href="portfolio.html" class="btn btn-outline" style="margin-top:10px; text-align:center; text-decoration:none; display:block; padding:14px 24px; font-size:15px; font-weight:700;">
+                Skip to Portfolio
+            </a>
+        </div>
     </div>
 
+    <!-- GAME OVER SCREEN -->
     <div class="screen" id="gameover-screen" style="display:none">
-        <h1>💥 Oops!</h1>
-        <p>Too many cones! You collected <span id="final-score-bad" style="color:#c8f03a;font-weight:700">0</span> stars.<br>Want to try again?</p>
-        <button class="btn" onclick="startGame()">Try Again</button>
+        <div class="screen-card">
+            <span class="screen-badge">Game Over</span>
+            <h1>You Hit<br>a Cone!</h1>
+            <p>You collected <span id="final-score-bad" class="score-hi">0</span> out of 10 stars.<br>Want to try again?</p>
+            <button class="btn" onclick="startGame()">Try Again</button>
+            <a href="portfolio.html" class="btn btn-portfolio" style="text-decoration:none;">
+                View Portfolio Anyway →
+            </a>
+        </div>
     </div>
 
+    <!-- WIN SCREEN -->
     <div class="screen" id="win-screen" style="display:none">
-        <h1>🎉 You Win!</h1>
-        <p>You collected all 10 stars!<br>Ina's portfolio is now unlocked.</p>
-        <a href="trial.html" class="btn">View My Portfolio →</a>
-        <button class="btn btn-ghost" onclick="startGame()">Play Again</button>
+        <div class="screen-card">
+            <span class="screen-badge">You Won!</span>
+            <h1>All Stars<br>Collected!</h1>
+            <p>You collected all 10 stars. Ina's portfolio is now unlocked.</p>
+            <a href="portfolio.html" class="btn" style="text-decoration:none;">View My Portfolio →</a>
+            <button class="btn btn-outline" onclick="startGame()" style="margin-top:10px;">Play Again</button>
+        </div>
     </div>
 
     <script>
@@ -128,6 +329,9 @@
         canvas.height = Math.min(660, window.innerHeight - 90);
         const W = canvas.width, H = canvas.height;
         const LANES = 3, LANE_W = W / LANES;
+
+        // Fixed star fall speed — independent of road/obstacle speed
+        const STAR_FALL_SPEED = 2.8;
 
         let car, obstacles, stars, particles, lives, score, gameRunning, roadOffset, speed, frameCount;
 
@@ -144,8 +348,8 @@
 
         document.addEventListener('keydown', e => {
             if(!gameRunning) return;
-            if(e.key==='ArrowLeft' ||e.key==='a'){ car.lane=Math.max(0,car.lane-1); car.targetX=laneX(car.lane); }
-            if(e.key==='ArrowRight'||e.key==='d'){ car.lane=Math.min(2,car.lane+1); car.targetX=laneX(car.lane); }
+            if(e.key==='ArrowLeft'  || e.key==='a'){ car.lane=Math.max(0,car.lane-1); car.targetX=laneX(car.lane); }
+            if(e.key==='ArrowRight' || e.key==='d'){ car.lane=Math.min(2,car.lane+1); car.targetX=laneX(car.lane); }
         });
 
         let tx = 0;
@@ -157,123 +361,143 @@
             if(dx >  30){ car.lane=Math.min(2,car.lane+1); car.targetX=laneX(car.lane); }
         });
 
+        // Spawn cone — avoid lanes occupied by stars near top of screen
         function spawnObstacle(){
-            const lane = Math.floor(Math.random() * LANES);
+            const blockedLanes = stars.filter(s => s.y < 220).map(s => s.lane);
+            const free = [0,1,2].filter(l => !blockedLanes.includes(l));
+            const lane = free.length ? free[Math.floor(Math.random() * free.length)] : Math.floor(Math.random() * LANES);
             obstacles.push({ lane, x:laneX(lane), y:-70, w:42, h:54 });
         }
+
+        // Spawn star — avoid lanes occupied by cones near top of screen
         function spawnStar(){
-            const lane = Math.floor(Math.random() * LANES);
+            const blockedLanes = obstacles.filter(o => o.y < 220).map(o => o.lane);
+            const free = [0,1,2].filter(l => !blockedLanes.includes(l));
+            const lane = free.length ? free[Math.floor(Math.random() * free.length)] : Math.floor(Math.random() * LANES);
             stars.push({ lane, x:laneX(lane), y:-28, r:16, spin:0, pulse:0 });
         }
+
         function spawnParticles(x, y, color, count=8){
             for(let i=0; i<count; i++){
-                const a = Math.random()*Math.PI*2, sp = 2+Math.random()*3;
+                const a = Math.random()*Math.PI*2, sp = 2+Math.random()*3.5;
                 particles.push({ x, y, vx:Math.cos(a)*sp, vy:Math.sin(a)*sp, r:3+Math.random()*4, life:1, color });
             }
         }
 
+        /* ── DRAW ROAD ── */
         function drawRoad(){
-            ctx.fillStyle = '#4a4a4a'; ctx.fillRect(0,0,W,H);
-            ctx.fillStyle = '#3d3d3d';
-            for(let y=0; y<H; y+=4){ ctx.fillRect(0,y,W,2); }
-            ctx.strokeStyle='rgba(255,255,255,0.15)'; ctx.lineWidth=1; ctx.setLineDash([]);
+            ctx.fillStyle = '#3a3a3a'; ctx.fillRect(0,0,W,H);
+            // subtle pavement texture
+            for(let y=0; y<H; y+=8){
+                ctx.fillStyle = y%16===0 ? 'rgba(0,0,0,0.06)' : 'transparent';
+                ctx.fillRect(0,y,W,8);
+            }
+            // lane dividers (subtle)
+            ctx.strokeStyle='rgba(255,255,255,0.08)'; ctx.lineWidth=1; ctx.setLineDash([]);
             for(let i=1; i<LANES; i++){
                 ctx.beginPath(); ctx.moveTo(i*LANE_W,0); ctx.lineTo(i*LANE_W,H); ctx.stroke();
             }
-            ctx.strokeStyle='#fff'; ctx.lineWidth=4; ctx.setLineDash([50,35]);
+            // animated dashes
+            ctx.strokeStyle='rgba(255,255,255,0.5)'; ctx.lineWidth=3; ctx.setLineDash([40,32]);
             ctx.lineDashOffset = -roadOffset;
             for(let i=1; i<LANES; i++){
                 ctx.beginPath(); ctx.moveTo(i*LANE_W,0); ctx.lineTo(i*LANE_W,H); ctx.stroke();
             }
             ctx.setLineDash([]);
-            ctx.strokeStyle='#fff'; ctx.lineWidth=6;
+            // edge lines
+            ctx.strokeStyle='rgba(255,255,255,0.6)'; ctx.lineWidth=5;
             ctx.beginPath(); ctx.moveTo(5,0); ctx.lineTo(5,H); ctx.stroke();
             ctx.beginPath(); ctx.moveTo(W-5,0); ctx.lineTo(W-5,H); ctx.stroke();
         }
 
+        /* ── DRAW CAR ── */
         function drawCar(){
-            const cx = car.x + (car.shake>0 ? (Math.random()-0.5)*6 : 0);
+            const cx = car.x + (car.shake>0 ? (Math.random()-0.5)*5 : 0);
             const cy = car.y;
             const w = car.w, h = car.h;
             ctx.save(); ctx.translate(cx, cy);
 
-            ctx.fillStyle = 'rgba(0,0,0,0.25)';
-            ctx.beginPath(); ctx.ellipse(0, h/2+4, w/2-4, 8, 0, 0, Math.PI*2); ctx.fill();
+            // shadow
+            ctx.fillStyle = 'rgba(0,0,0,0.3)';
+            ctx.beginPath(); ctx.ellipse(0, h/2+5, w/2-4, 8, 0, 0, Math.PI*2); ctx.fill();
 
+            // body
             const bodyGrad = ctx.createLinearGradient(-w/2,0,w/2,0);
-            bodyGrad.addColorStop(0,'#c0392b'); bodyGrad.addColorStop(0.35,'#e74c3c');
-            bodyGrad.addColorStop(0.65,'#e74c3c'); bodyGrad.addColorStop(1,'#c0392b');
+            bodyGrad.addColorStop(0,'#b91c1c'); bodyGrad.addColorStop(0.4,'#ef4444');
+            bodyGrad.addColorStop(0.6,'#ef4444'); bodyGrad.addColorStop(1,'#b91c1c');
             ctx.fillStyle = bodyGrad;
             ctx.beginPath(); ctx.roundRect(-w/2,-h/2,w,h,10); ctx.fill();
 
-            ctx.fillStyle = 'rgba(255,255,255,0.12)';
-            ctx.beginPath(); ctx.roundRect(-w/2+4,-h/2+4,w-8,h/2-8,6); ctx.fill();
+            // body shine
+            ctx.fillStyle = 'rgba(255,255,255,0.09)';
+            ctx.beginPath(); ctx.roundRect(-w/2+4,-h/2+4,w-8,h/2-10,5); ctx.fill();
 
-            const cabinGrad = ctx.createLinearGradient(-w/2+8,-h/2+8,w/2-8,-h/2+8);
-            cabinGrad.addColorStop(0,'#a93226'); cabinGrad.addColorStop(0.5,'#c0392b'); cabinGrad.addColorStop(1,'#a93226');
-            ctx.fillStyle = cabinGrad;
+            // cabin
+            const cabGrad = ctx.createLinearGradient(-w/2+8,-h/2,w/2-8,-h/2);
+            cabGrad.addColorStop(0,'#991b1b'); cabGrad.addColorStop(0.5,'#b91c1c'); cabGrad.addColorStop(1,'#991b1b');
+            ctx.fillStyle = cabGrad;
             ctx.beginPath(); ctx.roundRect(-w/2+7,-h/2+7,w-14,h*0.42,6); ctx.fill();
 
-            ctx.fillStyle = 'rgba(150,210,255,0.75)';
+            // windshield
+            ctx.fillStyle = 'rgba(147,210,255,0.75)';
             ctx.beginPath(); ctx.roundRect(-w/2+11,-h/2+11,w-22,20,4); ctx.fill();
-            ctx.strokeStyle='rgba(255,255,255,0.5)'; ctx.lineWidth=2;
-            ctx.beginPath(); ctx.moveTo(-w/2+13,-h/2+13); ctx.lineTo(-w/2+21,-h/2+13); ctx.stroke();
+            // wiper
+            ctx.strokeStyle='rgba(255,255,255,0.5)'; ctx.lineWidth=1.5;
+            ctx.beginPath(); ctx.moveTo(-w/2+14,-h/2+13); ctx.lineTo(-2,-h/2+13); ctx.stroke();
 
-            ctx.fillStyle='rgba(150,210,255,0.5)';
-            ctx.beginPath(); ctx.roundRect(-w/2+11,-h/2+38,w-22,12,3); ctx.fill();
+            // rear window
+            ctx.fillStyle='rgba(147,210,255,0.4)';
+            ctx.beginPath(); ctx.roundRect(-w/2+11,-h/2+38,w-22,11,3); ctx.fill();
 
-            const wheelDefs = [[-w/2-4,-h/2+4],[w/2-8,-h/2+4],[-w/2-4,h/2-22],[w/2-8,h/2-22]];
-            wheelDefs.forEach(([wx,wy]) => {
-                ctx.fillStyle='#1a1a2e'; ctx.beginPath(); ctx.roundRect(wx,wy,12,20,5); ctx.fill();
-                ctx.fillStyle='#333';    ctx.beginPath(); ctx.roundRect(wx+2,wy+3,8,14,3); ctx.fill();
-                ctx.fillStyle='rgba(255,255,255,0.15)'; ctx.beginPath(); ctx.arc(wx+6,wy+10,3,0,Math.PI*2); ctx.fill();
+            // wheels
+            [[-w/2-4,-h/2+4],[w/2-8,-h/2+4],[-w/2-4,h/2-22],[w/2-8,h/2-22]].forEach(([wx,wy]) => {
+                ctx.fillStyle='#111827'; ctx.beginPath(); ctx.roundRect(wx,wy,12,20,5); ctx.fill();
+                ctx.fillStyle='#374151'; ctx.beginPath(); ctx.roundRect(wx+2,wy+3,8,14,3); ctx.fill();
+                ctx.fillStyle='rgba(255,255,255,0.12)'; ctx.beginPath(); ctx.arc(wx+6,wy+10,3,0,Math.PI*2); ctx.fill();
             });
 
-            ctx.shadowColor='rgba(255,250,180,0.9)'; ctx.shadowBlur=12;
+            // headlights
+            ctx.shadowColor='rgba(255,250,180,0.95)'; ctx.shadowBlur=14;
             ctx.fillStyle='#fffacd';
-            ctx.beginPath(); ctx.ellipse(-w/2+9,h/2-7,5,4,0,0,Math.PI*2); ctx.fill();
-            ctx.beginPath(); ctx.ellipse( w/2-9,h/2-7,5,4,0,0,Math.PI*2); ctx.fill();
+            ctx.beginPath(); ctx.ellipse(-w/2+9,h/2-8,5,4,0,0,Math.PI*2); ctx.fill();
+            ctx.beginPath(); ctx.ellipse( w/2-9,h/2-8,5,4,0,0,Math.PI*2); ctx.fill();
             ctx.shadowBlur=0;
 
+            // brake lights
+            ctx.shadowColor='rgba(255,50,50,0.8)'; ctx.shadowBlur=8;
             ctx.fillStyle='#ff4444';
-            ctx.beginPath(); ctx.ellipse(-w/2+9,-h/2+8,4,3,0,0,Math.PI*2); ctx.fill();
-            ctx.beginPath(); ctx.ellipse( w/2-9,-h/2+8,4,3,0,0,Math.PI*2); ctx.fill();
+            ctx.beginPath(); ctx.ellipse(-w/2+9,-h/2+9,4,3,0,0,Math.PI*2); ctx.fill();
+            ctx.beginPath(); ctx.ellipse( w/2-9,-h/2+9,4,3,0,0,Math.PI*2); ctx.fill();
+            ctx.shadowBlur=0;
 
             ctx.restore();
         }
 
+        /* ── DRAW CONE ── */
         function drawCone(o){
             ctx.save(); ctx.translate(o.x, o.y);
             const w=o.w, h=o.h;
-
             ctx.fillStyle='rgba(0,0,0,0.2)';
             ctx.beginPath(); ctx.ellipse(0,h/2+3,w/2-4,7,0,0,Math.PI*2); ctx.fill();
-
-            const cg = ctx.createLinearGradient(-w/2,h/2,-w/2+w*0.3,h/2);
+            const cg = ctx.createLinearGradient(-w/2,0,w/2,0);
             cg.addColorStop(0,'#c0392b'); cg.addColorStop(0.4,'#e67e22'); cg.addColorStop(1,'#d35400');
             ctx.fillStyle=cg;
             ctx.beginPath();
-            ctx.moveTo(-w/2, h/2);
-            ctx.lineTo( w/2, h/2);
-            ctx.lineTo( w/2-4, h/2-8);
-            ctx.lineTo( 9, -h/2);
-            ctx.lineTo(-9, -h/2);
-            ctx.lineTo(-w/2+4, h/2-8);
+            ctx.moveTo(-w/2, h/2); ctx.lineTo(w/2, h/2);
+            ctx.lineTo(w/2-4, h/2-8); ctx.lineTo(9, -h/2);
+            ctx.lineTo(-9, -h/2); ctx.lineTo(-w/2+4, h/2-8);
             ctx.closePath(); ctx.fill();
-
             ctx.fillStyle='#f39c12';
             ctx.beginPath(); ctx.roundRect(-w/2,h/2-10,w,10,3); ctx.fill();
-
-            ctx.fillStyle='rgba(255,255,255,0.85)';
+            ctx.fillStyle='rgba(255,255,255,0.88)';
             ctx.beginPath(); ctx.roundRect(-o.w*0.55/2,-h/5,o.w*0.55,7,2); ctx.fill();
             ctx.beginPath(); ctx.roundRect(-o.w*0.72/2, h/5,o.w*0.72,7,2); ctx.fill();
-
             ctx.fillStyle='rgba(255,255,255,0.4)';
             ctx.beginPath(); ctx.ellipse(0,-h/2+4,4,3,0,0,Math.PI*2); ctx.fill();
-
             ctx.restore();
         }
 
+        /* ── DRAW STAR ── */
         function starPath(c, cx, cy, ro, ri, pts){
             c.beginPath();
             for(let i=0; i<pts*2; i++){
@@ -287,77 +511,121 @@
 
         function drawStar(s){
             ctx.save(); ctx.translate(s.x, s.y);
-            const sc = 1 + Math.sin(s.pulse)*0.12;
+            const sc = 1 + Math.sin(s.pulse) * 0.14;
             ctx.scale(sc, sc); ctx.rotate(s.spin);
 
-            const glow = ctx.createRadialGradient(0,0,s.r*0.3,0,0,s.r*1.8);
-            glow.addColorStop(0,'rgba(255,220,50,0.35)'); glow.addColorStop(1,'rgba(255,220,50,0)');
-            ctx.fillStyle=glow; ctx.beginPath(); ctx.arc(0,0,s.r*1.8,0,Math.PI*2); ctx.fill();
+            // outer glow (bigger, more visible)
+            const glow = ctx.createRadialGradient(0,0,s.r*0.2,0,0,s.r*2.5);
+            glow.addColorStop(0,'rgba(255,230,60,0.55)');
+            glow.addColorStop(1,'rgba(255,230,60,0)');
+            ctx.fillStyle=glow; ctx.beginPath(); ctx.arc(0,0,s.r*2.5,0,Math.PI*2); ctx.fill();
 
-            ctx.fillStyle='#f1c40f'; starPath(ctx,0,0,s.r,s.r*0.42,5); ctx.fill();
-            ctx.fillStyle='#f9e04b'; starPath(ctx,0,0,s.r*0.65,s.r*0.28,5); ctx.fill();
+            // outer star
+            ctx.fillStyle='#f1c40f';
+            starPath(ctx,0,0,s.r,s.r*0.42,5); ctx.fill();
 
-            ctx.fillStyle='#fff';
-            ctx.beginPath(); ctx.arc(-s.r*0.25,-s.r*0.25,s.r*0.18,0,Math.PI*2); ctx.fill();
+            // inner highlight
+            ctx.fillStyle='#fef08a';
+            starPath(ctx,0,0,s.r*0.62,s.r*0.26,5); ctx.fill();
+
+            // shine dot
+            ctx.fillStyle='rgba(255,255,255,0.85)';
+            ctx.beginPath(); ctx.arc(-s.r*0.22,-s.r*0.22,s.r*0.16,0,Math.PI*2); ctx.fill();
 
             ctx.restore();
         }
 
+        /* ── DRAW PARTICLE ── */
         function drawParticle(p){
             ctx.save(); ctx.globalAlpha=p.life;
-            ctx.fillStyle=p.color; ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2); ctx.fill();
+            ctx.fillStyle=p.color;
+            ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2); ctx.fill();
             ctx.restore();
         }
 
+        /* ── DRAW HUD ── */
         function drawHUD(){
+            // Lives as hearts
             for(let i=0; i<3; i++){
-                ctx.globalAlpha = i < lives ? 1 : 0.2;
-                ctx.font='20px serif'; ctx.fillText('❤️', 10+i*28, H-14);
+                ctx.globalAlpha = i < lives ? 1 : 0.15;
+                ctx.font='17px serif';
+                ctx.fillText('❤️', 12+i*24, H-13);
             }
             ctx.globalAlpha=1;
+
+            // Speed bar
+            const pct = Math.min((speed - 4) / 9, 1);
+            const bw=58, bh=4, bx=W-70, by=H-19;
+            ctx.fillStyle='rgba(255,255,255,0.1)';
+            ctx.beginPath(); ctx.roundRect(bx,by,bw,bh,2); ctx.fill();
+            const r=Math.round(200+pct*55), g=Math.round(240-pct*160), b=Math.round(58-pct*58);
+            ctx.fillStyle=`rgb(${r},${g},${b})`;
+            ctx.beginPath(); ctx.roundRect(bx,by,bw*pct,bh,2); ctx.fill();
+            ctx.font='8px monospace';
+            ctx.fillStyle='rgba(255,255,255,0.3)';
+            ctx.fillText('SPD', bx, by-4);
         }
 
+        /* ── SPEED LINES ── */
         function drawSpeedLines(){
             if(speed < 6) return;
-            ctx.save(); ctx.strokeStyle='rgba(255,255,255,0.06)'; ctx.lineWidth=1;
+            const alpha = Math.min((speed-6)/14, 0.12);
+            ctx.save(); ctx.strokeStyle=`rgba(255,255,255,${alpha})`; ctx.lineWidth=1;
             for(let i=0; i<10; i++){
                 const lx = Math.random()*W;
-                ctx.beginPath(); ctx.moveTo(lx,0); ctx.lineTo(lx,H); ctx.stroke();
+                ctx.beginPath(); ctx.moveTo(lx,Math.random()*H*0.5); ctx.lineTo(lx,Math.random()*H); ctx.stroke();
             }
             ctx.restore();
         }
 
+        /* ── COLLISION ── */
         function overlap(ax,ay,aw,ah,bx,by,bw,bh){
             return ax<bx+bw && ax+aw>bx && ay<by+bh && ay+ah>by;
         }
 
+        /* ── MAIN LOOP ── */
         function loop(){
             if(!gameRunning) return;
             frameCount++;
-            if(frameCount%280===0) speed = Math.min(speed+0.5, 13);
+
+            // Gradually increase road/cone speed
+            if(frameCount % 300 === 0) speed = Math.min(speed + 0.5, 13);
             roadOffset = (roadOffset + speed) % 85;
 
+            // Smooth car movement
             car.x += (car.targetX - car.x) * 0.18;
             if(car.shake > 0) car.shake--;
 
-            if(frameCount%68===0) spawnObstacle();
-            if(frameCount%88===0) spawnStar();
+            // Spawn timing
+            if(frameCount % 82  === 0) spawnObstacle();
+            if(frameCount % 100 === 0) spawnStar();
 
+            // Move obstacles at road speed
             obstacles.forEach(o => { o.y += speed; });
-            obstacles = obstacles.filter(o => o.y < H+80);
-            stars.forEach(s => { s.y += speed*0.78; s.spin += 0.03; s.pulse += 0.08; });
-            stars = stars.filter(s => s.y < H+40);
-            particles.forEach(p => { p.x+=p.vx; p.y+=p.vy; p.vy+=0.1; p.life-=0.04; p.r*=0.95; });
+            obstacles = obstacles.filter(o => o.y < H + 80);
+
+            // Move stars at FIXED independent speed (not road speed)
+            stars.forEach(s => {
+                s.y    += STAR_FALL_SPEED;
+                s.spin  += 0.045;
+                s.pulse += 0.1;
+            });
+            stars = stars.filter(s => s.y < H + 40);
+
+            // Update particles
+            particles.forEach(p => { p.x+=p.vx; p.y+=p.vy; p.vy+=0.12; p.life-=0.033; p.r*=0.94; });
             particles = particles.filter(p => p.life > 0);
 
+            // Cone collision
             obstacles = obstacles.filter(o => {
-                const hit = overlap(car.x-car.w/2,car.y-car.h/2,car.w,car.h, o.x-o.w/2,o.y-o.h/2,o.w,o.h);
+                const hit = overlap(car.x-car.w/2, car.y-car.h/2, car.w, car.h,
+                                    o.x-o.w/2,    o.y-o.h/2,    o.w, o.h);
                 if(hit){
-                    lives--; car.shake=18;
-                    spawnParticles(car.x, car.y, '#e74c3c', 12);
-                    if(lives<=0){
-                        gameRunning=false;
-                        document.getElementById('final-score-bad').textContent=score;
+                    lives--; car.shake = 20;
+                    spawnParticles(car.x, car.y, '#ef4444', 14);
+                    if(lives <= 0){
+                        gameRunning = false;
+                        document.getElementById('final-score-bad').textContent = score;
                         showScreen('gameover-screen');
                     }
                     return false;
@@ -365,17 +633,22 @@
                 return true;
             });
 
+            // Star collection
             stars = stars.filter(s => {
-                const hit = overlap(car.x-car.w/2,car.y-car.h/2,car.w,car.h, s.x-s.r,s.y-s.r,s.r*2,s.r*2);
+                const hit = overlap(car.x-car.w/2, car.y-car.h/2, car.w, car.h,
+                                    s.x-s.r, s.y-s.r, s.r*2, s.r*2);
                 if(hit){
-                    score++; document.getElementById('live-score').textContent=score;
-                    spawnParticles(s.x, s.y, '#f1c40f', 10);
-                    if(score>=10){ gameRunning=false; showScreen('win-screen'); }
+                    score++;
+                    document.getElementById('live-score').textContent = score;
+                    spawnParticles(s.x, s.y, '#fbbf24', 12);
+                    spawnParticles(s.x, s.y, '#fef08a', 5);
+                    if(score >= 10){ gameRunning = false; showScreen('win-screen'); }
                     return false;
                 }
                 return true;
             });
 
+            // Render
             drawRoad();
             drawSpeedLines();
             stars.forEach(drawStar);
@@ -386,8 +659,15 @@
             requestAnimationFrame(loop);
         }
 
-        function hideAll(){ ['start-screen','gameover-screen','win-screen'].forEach(id => { document.getElementById(id).style.display='none'; }); }
-        function showScreen(id){ hideAll(); document.getElementById(id).style.display='flex'; }
+        function hideAll(){
+            ['start-screen','gameover-screen','win-screen'].forEach(id => {
+                document.getElementById(id).style.display = 'none';
+            });
+        }
+        function showScreen(id){
+            hideAll();
+            document.getElementById(id).style.display = 'flex';
+        }
     </script>
 </body>
 </html>
