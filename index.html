@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ina — Drive to Portfolio</title>
+    <title>Ina: Drive to Portfolio</title>
     <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -156,6 +156,14 @@
             letter-spacing: 0.08em;
         }
 
+        /* cone icon SVG inline for pill */
+        .cone-icon {
+            display: inline-block;
+            width: 22px;
+            height: 22px;
+            margin-bottom: 2px;
+        }
+
         /* ── BUTTONS ── */
         .btn {
             background: #c8f03a;
@@ -242,20 +250,6 @@
             letter-spacing: 0.08em;
             white-space: nowrap;
         }
-
-        /* ── LIVES DISPLAY ── */
-        .lives-row {
-            display: flex;
-            gap: 6px;
-            align-items: center;
-            margin-bottom: 12px;
-        }
-
-        .live-dot {
-            width: 8px; height: 8px;
-            border-radius: 50%;
-            background: #ef4444;
-        }
     </style>
 </head>
 <body>
@@ -264,7 +258,7 @@
         <img src="images/removed background logo.png" alt="ina" style="height: 38px; object-fit: contain;">
         <div id="score-pill">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="#c8f03a"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg>
-            <span id="live-score">0</span> / 10
+            <span id="live-score">0</span> / 5
         </div>
     </div>
 
@@ -276,10 +270,10 @@
         <div class="screen-card">
             <span class="screen-badge">Interactive Intro</span>
             <h1>Drive to<br>Portfolio</h1>
-            <p>Collect 10 stars to unlock Ina's portfolio.<br>Dodge the traffic cones — you have 3 lives!</p>
+            <p>Collect 5 stars to unlock Ina's portfolio.<br>Dodge the traffic cones. You have 3 lives!</p>
             <div class="game-info">
                 <div class="info-pill">
-                    <span class="pill-val accent">10</span>
+                    <span class="pill-val accent">5</span>
                     <span class="pill-label">Stars</span>
                 </div>
                 <div class="info-pill">
@@ -287,7 +281,15 @@
                     <span class="pill-label">Lives</span>
                 </div>
                 <div class="info-pill">
-                    <span class="pill-val">🚧</span>
+                    <!-- Inline cone SVG icon -->
+                    <span class="pill-val" style="display:flex;justify-content:center;align-items:center;">
+                        <svg class="cone-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <polygon points="12,2 20,20 4,20" fill="#e67e22" stroke="#c0392b" stroke-width="1"/>
+                            <rect x="4" y="19" width="16" height="3" rx="1.5" fill="#f39c12"/>
+                            <rect x="7.5" y="11" width="9" height="2" rx="1" fill="rgba(255,255,255,0.85)"/>
+                            <rect x="6" y="15.5" width="12" height="2" rx="1" fill="rgba(255,255,255,0.85)"/>
+                        </svg>
+                    </span>
                     <span class="pill-label">Dodge</span>
                 </div>
             </div>
@@ -303,7 +305,7 @@
         <div class="screen-card">
             <span class="screen-badge">Game Over</span>
             <h1>You Hit<br>a Cone!</h1>
-            <p>You collected <span id="final-score-bad" class="score-hi">0</span> out of 10 stars.<br>Want to try again?</p>
+            <p>You collected <span id="final-score-bad" class="score-hi">0</span> out of 5 stars.<br>Want to try again?</p>
             <button class="btn" onclick="startGame()">Try Again</button>
             <a href="portfolio.html" class="btn btn-portfolio" style="text-decoration:none;">
                 View Portfolio Anyway →
@@ -316,7 +318,7 @@
         <div class="screen-card">
             <span class="screen-badge">You Won!</span>
             <h1>All Stars<br>Collected!</h1>
-            <p>You collected all 10 stars. Ina's portfolio is now unlocked.</p>
+            <p>You collected all 5 stars. Ina's portfolio is now unlocked.</p>
             <a href="portfolio.html" class="btn" style="text-decoration:none;">View My Portfolio →</a>
             <button class="btn btn-outline" onclick="startGame()" style="margin-top:10px;">Play Again</button>
         </div>
@@ -330,7 +332,6 @@
         const W = canvas.width, H = canvas.height;
         const LANES = 3, LANE_W = W / LANES;
 
-        // Fixed star fall speed — independent of road/obstacle speed
         const STAR_FALL_SPEED = 2.8;
 
         let car, obstacles, stars, particles, lives, score, gameRunning, roadOffset, speed, frameCount;
@@ -361,7 +362,6 @@
             if(dx >  30){ car.lane=Math.min(2,car.lane+1); car.targetX=laneX(car.lane); }
         });
 
-        // Spawn cone — avoid lanes occupied by stars near top of screen
         function spawnObstacle(){
             const blockedLanes = stars.filter(s => s.y < 220).map(s => s.lane);
             const free = [0,1,2].filter(l => !blockedLanes.includes(l));
@@ -369,7 +369,6 @@
             obstacles.push({ lane, x:laneX(lane), y:-70, w:42, h:54 });
         }
 
-        // Spawn star — avoid lanes occupied by cones near top of screen
         function spawnStar(){
             const blockedLanes = obstacles.filter(o => o.y < 220).map(o => o.lane);
             const free = [0,1,2].filter(l => !blockedLanes.includes(l));
@@ -384,96 +383,69 @@
             }
         }
 
-        /* ── DRAW ROAD ── */
         function drawRoad(){
             ctx.fillStyle = '#3a3a3a'; ctx.fillRect(0,0,W,H);
-            // subtle pavement texture
             for(let y=0; y<H; y+=8){
                 ctx.fillStyle = y%16===0 ? 'rgba(0,0,0,0.06)' : 'transparent';
                 ctx.fillRect(0,y,W,8);
             }
-            // lane dividers (subtle)
             ctx.strokeStyle='rgba(255,255,255,0.08)'; ctx.lineWidth=1; ctx.setLineDash([]);
             for(let i=1; i<LANES; i++){
                 ctx.beginPath(); ctx.moveTo(i*LANE_W,0); ctx.lineTo(i*LANE_W,H); ctx.stroke();
             }
-            // animated dashes
             ctx.strokeStyle='rgba(255,255,255,0.5)'; ctx.lineWidth=3; ctx.setLineDash([40,32]);
             ctx.lineDashOffset = -roadOffset;
             for(let i=1; i<LANES; i++){
                 ctx.beginPath(); ctx.moveTo(i*LANE_W,0); ctx.lineTo(i*LANE_W,H); ctx.stroke();
             }
             ctx.setLineDash([]);
-            // edge lines
             ctx.strokeStyle='rgba(255,255,255,0.6)'; ctx.lineWidth=5;
             ctx.beginPath(); ctx.moveTo(5,0); ctx.lineTo(5,H); ctx.stroke();
             ctx.beginPath(); ctx.moveTo(W-5,0); ctx.lineTo(W-5,H); ctx.stroke();
         }
 
-        /* ── DRAW CAR ── */
         function drawCar(){
             const cx = car.x + (car.shake>0 ? (Math.random()-0.5)*5 : 0);
             const cy = car.y;
             const w = car.w, h = car.h;
             ctx.save(); ctx.translate(cx, cy);
-
-            // shadow
             ctx.fillStyle = 'rgba(0,0,0,0.3)';
             ctx.beginPath(); ctx.ellipse(0, h/2+5, w/2-4, 8, 0, 0, Math.PI*2); ctx.fill();
-
-            // body
             const bodyGrad = ctx.createLinearGradient(-w/2,0,w/2,0);
             bodyGrad.addColorStop(0,'#b91c1c'); bodyGrad.addColorStop(0.4,'#ef4444');
             bodyGrad.addColorStop(0.6,'#ef4444'); bodyGrad.addColorStop(1,'#b91c1c');
             ctx.fillStyle = bodyGrad;
             ctx.beginPath(); ctx.roundRect(-w/2,-h/2,w,h,10); ctx.fill();
-
-            // body shine
             ctx.fillStyle = 'rgba(255,255,255,0.09)';
             ctx.beginPath(); ctx.roundRect(-w/2+4,-h/2+4,w-8,h/2-10,5); ctx.fill();
-
-            // cabin
             const cabGrad = ctx.createLinearGradient(-w/2+8,-h/2,w/2-8,-h/2);
             cabGrad.addColorStop(0,'#991b1b'); cabGrad.addColorStop(0.5,'#b91c1c'); cabGrad.addColorStop(1,'#991b1b');
             ctx.fillStyle = cabGrad;
             ctx.beginPath(); ctx.roundRect(-w/2+7,-h/2+7,w-14,h*0.42,6); ctx.fill();
-
-            // windshield
             ctx.fillStyle = 'rgba(147,210,255,0.75)';
             ctx.beginPath(); ctx.roundRect(-w/2+11,-h/2+11,w-22,20,4); ctx.fill();
-            // wiper
             ctx.strokeStyle='rgba(255,255,255,0.5)'; ctx.lineWidth=1.5;
             ctx.beginPath(); ctx.moveTo(-w/2+14,-h/2+13); ctx.lineTo(-2,-h/2+13); ctx.stroke();
-
-            // rear window
             ctx.fillStyle='rgba(147,210,255,0.4)';
             ctx.beginPath(); ctx.roundRect(-w/2+11,-h/2+38,w-22,11,3); ctx.fill();
-
-            // wheels
             [[-w/2-4,-h/2+4],[w/2-8,-h/2+4],[-w/2-4,h/2-22],[w/2-8,h/2-22]].forEach(([wx,wy]) => {
                 ctx.fillStyle='#111827'; ctx.beginPath(); ctx.roundRect(wx,wy,12,20,5); ctx.fill();
                 ctx.fillStyle='#374151'; ctx.beginPath(); ctx.roundRect(wx+2,wy+3,8,14,3); ctx.fill();
                 ctx.fillStyle='rgba(255,255,255,0.12)'; ctx.beginPath(); ctx.arc(wx+6,wy+10,3,0,Math.PI*2); ctx.fill();
             });
-
-            // headlights
             ctx.shadowColor='rgba(255,250,180,0.95)'; ctx.shadowBlur=14;
             ctx.fillStyle='#fffacd';
             ctx.beginPath(); ctx.ellipse(-w/2+9,h/2-8,5,4,0,0,Math.PI*2); ctx.fill();
             ctx.beginPath(); ctx.ellipse( w/2-9,h/2-8,5,4,0,0,Math.PI*2); ctx.fill();
             ctx.shadowBlur=0;
-
-            // brake lights
             ctx.shadowColor='rgba(255,50,50,0.8)'; ctx.shadowBlur=8;
             ctx.fillStyle='#ff4444';
             ctx.beginPath(); ctx.ellipse(-w/2+9,-h/2+9,4,3,0,0,Math.PI*2); ctx.fill();
             ctx.beginPath(); ctx.ellipse( w/2-9,-h/2+9,4,3,0,0,Math.PI*2); ctx.fill();
             ctx.shadowBlur=0;
-
             ctx.restore();
         }
 
-        /* ── DRAW CONE ── */
         function drawCone(o){
             ctx.save(); ctx.translate(o.x, o.y);
             const w=o.w, h=o.h;
@@ -497,7 +469,6 @@
             ctx.restore();
         }
 
-        /* ── DRAW STAR ── */
         function starPath(c, cx, cy, ro, ri, pts){
             c.beginPath();
             for(let i=0; i<pts*2; i++){
@@ -513,29 +484,19 @@
             ctx.save(); ctx.translate(s.x, s.y);
             const sc = 1 + Math.sin(s.pulse) * 0.14;
             ctx.scale(sc, sc); ctx.rotate(s.spin);
-
-            // outer glow (bigger, more visible)
             const glow = ctx.createRadialGradient(0,0,s.r*0.2,0,0,s.r*2.5);
             glow.addColorStop(0,'rgba(255,230,60,0.55)');
             glow.addColorStop(1,'rgba(255,230,60,0)');
             ctx.fillStyle=glow; ctx.beginPath(); ctx.arc(0,0,s.r*2.5,0,Math.PI*2); ctx.fill();
-
-            // outer star
             ctx.fillStyle='#f1c40f';
             starPath(ctx,0,0,s.r,s.r*0.42,5); ctx.fill();
-
-            // inner highlight
             ctx.fillStyle='#fef08a';
             starPath(ctx,0,0,s.r*0.62,s.r*0.26,5); ctx.fill();
-
-            // shine dot
             ctx.fillStyle='rgba(255,255,255,0.85)';
             ctx.beginPath(); ctx.arc(-s.r*0.22,-s.r*0.22,s.r*0.16,0,Math.PI*2); ctx.fill();
-
             ctx.restore();
         }
 
-        /* ── DRAW PARTICLE ── */
         function drawParticle(p){
             ctx.save(); ctx.globalAlpha=p.life;
             ctx.fillStyle=p.color;
@@ -543,30 +504,41 @@
             ctx.restore();
         }
 
-        /* ── DRAW HUD ── */
         function drawHUD(){
-            // Lives as hearts
-            for(let i=0; i<3; i++){
-                ctx.globalAlpha = i < lives ? 1 : 0.15;
-                ctx.font='17px serif';
-                ctx.fillText('❤️', 12+i*24, H-13);
-            }
-            ctx.globalAlpha=1;
+            const heartSize = 16;
+            const startX = 28;
+            const heartY = H - 22;
 
-            // Speed bar
-            const pct = Math.min((speed - 4) / 9, 1);
-            const bw=58, bh=4, bx=W-70, by=H-19;
-            ctx.fillStyle='rgba(255,255,255,0.1)';
-            ctx.beginPath(); ctx.roundRect(bx,by,bw,bh,2); ctx.fill();
-            const r=Math.round(200+pct*55), g=Math.round(240-pct*160), b=Math.round(58-pct*58);
-            ctx.fillStyle=`rgb(${r},${g},${b})`;
-            ctx.beginPath(); ctx.roundRect(bx,by,bw*pct,bh,2); ctx.fill();
-            ctx.font='8px monospace';
-            ctx.fillStyle='rgba(255,255,255,0.3)';
-            ctx.fillText('SPD', bx, by-4);
+            for(let i = 0; i < 3; i++){
+                const hx = startX + i * (heartSize + 12);
+                const active = i < lives;
+
+                ctx.save();
+                ctx.translate(hx, heartY);
+
+                if(active){
+                    ctx.fillStyle = '#ef4444';
+                    ctx.shadowColor = 'rgba(239,68,68,0.7)';
+                    ctx.shadowBlur = 8;
+                } else {
+                    ctx.fillStyle = 'rgba(255,255,255,0.18)';
+                    ctx.shadowBlur = 0;
+                }
+
+                const s = heartSize * 0.5;
+                ctx.beginPath();
+                ctx.moveTo(0, s * 0.35);
+                ctx.bezierCurveTo(0, -s * 0.1, -s, -s * 0.1, -s, s * 0.35);
+                ctx.bezierCurveTo(-s, s * 0.85, 0, s * 1.3, 0, s * 1.6);
+                ctx.bezierCurveTo(0, s * 1.3, s, s * 0.85, s, s * 0.35);
+                ctx.bezierCurveTo(s, -s * 0.1, 0, -s * 0.1, 0, s * 0.35);
+                ctx.fill();
+
+                ctx.shadowBlur = 0;
+                ctx.restore();
+            }
         }
 
-        /* ── SPEED LINES ── */
         function drawSpeedLines(){
             if(speed < 6) return;
             const alpha = Math.min((speed-6)/14, 0.12);
@@ -578,45 +550,29 @@
             ctx.restore();
         }
 
-        /* ── COLLISION ── */
         function overlap(ax,ay,aw,ah,bx,by,bw,bh){
             return ax<bx+bw && ax+aw>bx && ay<by+bh && ay+ah>by;
         }
 
-        /* ── MAIN LOOP ── */
         function loop(){
             if(!gameRunning) return;
             frameCount++;
-
-            // Gradually increase road/cone speed
             if(frameCount % 300 === 0) speed = Math.min(speed + 0.5, 13);
             roadOffset = (roadOffset + speed) % 85;
-
-            // Smooth car movement
             car.x += (car.targetX - car.x) * 0.18;
             if(car.shake > 0) car.shake--;
-
-            // Spawn timing
             if(frameCount % 82  === 0) spawnObstacle();
             if(frameCount % 100 === 0) spawnStar();
-
-            // Move obstacles at road speed
             obstacles.forEach(o => { o.y += speed; });
             obstacles = obstacles.filter(o => o.y < H + 80);
-
-            // Move stars at FIXED independent speed (not road speed)
             stars.forEach(s => {
                 s.y    += STAR_FALL_SPEED;
                 s.spin  += 0.045;
                 s.pulse += 0.1;
             });
             stars = stars.filter(s => s.y < H + 40);
-
-            // Update particles
             particles.forEach(p => { p.x+=p.vx; p.y+=p.vy; p.vy+=0.12; p.life-=0.033; p.r*=0.94; });
             particles = particles.filter(p => p.life > 0);
-
-            // Cone collision
             obstacles = obstacles.filter(o => {
                 const hit = overlap(car.x-car.w/2, car.y-car.h/2, car.w, car.h,
                                     o.x-o.w/2,    o.y-o.h/2,    o.w, o.h);
@@ -632,8 +588,6 @@
                 }
                 return true;
             });
-
-            // Star collection
             stars = stars.filter(s => {
                 const hit = overlap(car.x-car.w/2, car.y-car.h/2, car.w, car.h,
                                     s.x-s.r, s.y-s.r, s.r*2, s.r*2);
@@ -642,13 +596,11 @@
                     document.getElementById('live-score').textContent = score;
                     spawnParticles(s.x, s.y, '#fbbf24', 12);
                     spawnParticles(s.x, s.y, '#fef08a', 5);
-                    if(score >= 10){ gameRunning = false; showScreen('win-screen'); }
+                    if(score >= 5){ gameRunning = false; showScreen('win-screen'); }
                     return false;
                 }
                 return true;
             });
-
-            // Render
             drawRoad();
             drawSpeedLines();
             stars.forEach(drawStar);
