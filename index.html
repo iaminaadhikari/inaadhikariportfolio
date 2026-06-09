@@ -305,7 +305,7 @@
     </div>
 
     <canvas id="gameCanvas"></canvas>
-    <div id="controls-hint">← → Arrow Keys &nbsp;·&nbsp; A D Keys &nbsp;·&nbsp; Swipe to steer</div>
+    <div id="controls-hint">← → ↑ ↓ Arrow Keys &nbsp;·&nbsp; A D W S Keys &nbsp;·&nbsp; Swipe to steer</div>
 
     <!-- START SCREEN -->
     <div class="screen" id="start-screen">
@@ -373,7 +373,7 @@
         const W = canvas.width, H = canvas.height;
         const LANES = 3, LANE_W = W / LANES;
 
-        let car, obstacles, vehicles, stars, particles, lives, score, gameRunning, roadOffset, speed, frameCount;
+        let car, obstacles, vehicles, stars, particles, lives, score, gameRunning, roadOffset, speed, frameCount, starCooldown, lastStarLane;
 
         // ── VEHICLE COLORS for other traffic ──
         const VEHICLE_COLORS = [
@@ -388,27 +388,40 @@
 
         function startGame(){
             hideAll();
-            car = { lane:1, x:laneX(1), targetX:laneX(1), y:H-130, w:46, h:86, shake:0 };
+            car = { lane:1, x:laneX(1), targetX:laneX(1), y:H-130, targetY:H-130, w:46, h:86, shake:0 };
             obstacles=[]; vehicles=[]; stars=[]; particles=[];
-            lives=3; score=0; speed=4; frameCount=0; roadOffset=0; gameRunning=true;
+            lives=3; score=0; speed=4; frameCount=0; roadOffset=0; gameRunning=true; starCooldown = 0; lastStarLane = -1;
             document.getElementById('live-score').textContent = 0;
             requestAnimationFrame(loop);
         }
 
-        document.addEventListener('keydown', e => {
-            if(!gameRunning) return;
-            if(e.key==='ArrowLeft'  || e.key==='a'){ car.lane=Math.max(0,car.lane-1); car.targetX=laneX(car.lane); }
-            if(e.key==='ArrowRight' || e.key==='d'){ car.lane=Math.min(2,car.lane+1); car.targetX=laneX(car.lane); }
-        });
+        const keys = {};
+document.addEventListener('keydown', e => {
+    keys[e.key] = true;
+    if(!gameRunning) return;
+    if(e.key==='ArrowLeft'  || e.key==='a'){ car.lane=Math.max(0,car.lane-1); car.targetX=laneX(car.lane); }
+    if(e.key==='ArrowRight' || e.key==='d'){ car.lane=Math.min(2,car.lane+1); car.targetX=laneX(car.lane); }
+});
+document.addEventListener('keyup', e => { keys[e.key] = false; });
 
-        let tx = 0;
-        canvas.addEventListener('touchstart', e => { tx = e.touches[0].clientX; });
-        canvas.addEventListener('touchend',   e => {
-            if(!gameRunning) return;
-            const dx = e.changedTouches[0].clientX - tx;
-            if(dx < -30){ car.lane=Math.max(0,car.lane-1); car.targetX=laneX(car.lane); }
-            if(dx >  30){ car.lane=Math.min(2,car.lane+1); car.targetX=laneX(car.lane); }
-        });
+        let tx = 0, ty = 0;
+canvas.addEventListener('touchstart', e => {
+    tx = e.touches[0].clientX;
+    ty = e.touches[0].clientY;
+});
+canvas.addEventListener('touchend', e => {
+    if(!gameRunning) return;
+    const dx = e.changedTouches[0].clientX - tx;
+    const dy = e.changedTouches[0].clientY - ty;
+    const V_MIN = H * 0.5, V_MAX = H - 60;
+    if(Math.abs(dx) > Math.abs(dy)){
+        if(dx < -30){ car.lane=Math.max(0,car.lane-1); car.targetX=laneX(car.lane); }
+        if(dx >  30){ car.lane=Math.min(2,car.lane+1); car.targetX=laneX(car.lane); }
+    } else {
+        if(dy < -30) car.targetY = Math.max(V_MIN, car.targetY - 80);
+        if(dy >  30) car.targetY = Math.min(V_MAX, car.targetY + 80);
+    }
+});
 
         // ── SPAWN CONE ──
         function spawnObstacle(){
@@ -440,14 +453,25 @@
             });
         }
 
-        // ── SPAWN STAR — fixed position on road, no Y movement ──
+        // ── SPAWN STAR — solo, random gap, no lane repeat ──
         function spawnStar(){
-            // Avoid placing on top of existing objects
-            const occupiedY = [...obstacles, ...vehicles].map(o => o.y);
-            const lane = Math.floor(Math.random() * LANES);
-            // Random Y inside visible road, away from edges and from car spawn zone
-            const starY = 80 + Math.random() * (H - 280);
-            stars.push({ lane, x:laneX(lane), y:starY, r:16, spin:0, pulse:0 });
+            // Never repeat the last lane; also avoid lanes currently blocked by cones/vehicles
+            const blockedLanes = [...obstacles, ...vehicles]
+                .filter(o => o.y > -100 && o.y < H)
+                .map(o => o.lane);
+
+            // Prefer lanes that are neither last-used nor blocked
+            let candidates = [0,1,2].filter(l => l !== lastStarLane && !blockedLanes.includes(l));
+
+            // Fall back: at least avoid the last lane
+            if(candidates.length === 0) candidates = [0,1,2].filter(l => l !== lastStarLane);
+
+            // Last resort: any lane
+            if(candidates.length === 0) candidates = [0,1,2];
+
+            const lane = candidates[Math.floor(Math.random() * candidates.length)];
+            lastStarLane = lane;
+            stars.push({ lane, x:laneX(lane), y:-28, r:16, spin:0, pulse:0 });
         }
 
         function spawnParticles(x, y, color, count=8){
@@ -826,11 +850,26 @@
 
             // Smooth car lateral movement
             car.x += (car.targetX - car.x) * 0.18;
-            if(car.shake > 0) car.shake--;
+
+// Vertical movement — held keys move car smoothly up/down
+const V_MIN = H * 0.5, V_MAX = H - 60, V_STEP = 4;
+if((keys['ArrowUp']   || keys['w'] || keys['W']) && gameRunning) car.targetY = Math.max(V_MIN, car.targetY - V_STEP);
+if((keys['ArrowDown'] || keys['s'] || keys['S']) && gameRunning) car.targetY = Math.min(V_MAX, car.targetY + V_STEP);
+car.y += (car.targetY - car.y) * 0.18;
+
+if(car.shake > 0) car.shake--;
 
             // Spawn timing
             if(frameCount % 80  === 0) spawnObstacle();
-            if(frameCount % 55  === 0) spawnStar();          // spawn new stationary stars regularly
+            // Only one star on screen at a time, with a random unpredictable gap
+            if(stars.length === 0){
+                if(starCooldown <= 0){
+                    spawnStar();
+                    starCooldown = 30 + Math.floor(Math.random() * 26);
+                } else {
+                    starCooldown--;
+                }
+            }         // spawn new stationary stars regularly
             if(score >= 3 && frameCount % 120 === 0) spawnVehicle();
 
             // Move obstacles (cones fall down)
@@ -841,13 +880,12 @@
             vehicles.forEach(v => { v.y += v.speed; });
             vehicles = vehicles.filter(v => v.y < H + 120);
 
-            // Stars DO NOT move — only spin/pulse in place
+            // Stars fall down the road, spin and pulse
             stars.forEach(s => {
+                s.y    += 2.8;
                 s.spin  += 0.04;
                 s.pulse += 0.09;
-                // No s.y change — stars are stationary on the road
             });
-            // Remove stars only if car has passed them (y > car.y + 60) — they stay until collected or passed
             stars = stars.filter(s => s.y < H + 40);
 
             // Particles
