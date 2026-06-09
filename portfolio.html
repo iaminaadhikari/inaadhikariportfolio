@@ -271,7 +271,7 @@
             transform: translateY(-2px);
         }
 
-        /* ── HERO SOCIAL — fixed to left edge ── */
+        /* ── HERO SOCIAL ── */
         .hero-social {
             position: fixed;
             right: 28px;
@@ -607,7 +607,9 @@
             border-radius: 100px;
         }
 
-        /* ── SKILLS ── */
+        /* ══════════════════════════════════════════
+           SKILLS — Icon only, bigger, no labels
+        ══════════════════════════════════════════ */
         .skills-wrapper {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -646,45 +648,82 @@
             text-transform: uppercase;
         }
 
+        /* Icon-only pills — square, bigger icon */
         .skill-pills {
             display: flex;
             flex-wrap: wrap;
-            gap: 7px;
+            gap: 8px;
         }
 
         .skill-pill {
             display: inline-flex;
             align-items: center;
-            gap: 6px;
+            justify-content: center;
+            width: 46px;
+            height: 46px;
             background: var(--surface2);
             border: 1px solid var(--border);
-            color: var(--text);
-            font-size: 0.82rem;
-            padding: 5px 11px;
-            border-radius: 6px;
+            border-radius: 10px;
             transition: all 0.2s;
-            white-space: nowrap;
+            position: relative;
+            cursor: default;
+            flex-shrink: 0;
         }
         .skill-pill:hover {
             border-color: var(--accent);
-            color: var(--accent);
+            background: rgba(200,240,58,0.06);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 18px rgba(0,0,0,0.3);
         }
-        .skill-pill img {
-            width: 15px; height: 15px;
-            object-fit: contain;
-            border-radius: 2px;
-        }
-        .skill-pill i { font-size: 0.9rem; }
 
-        /* ── CERTIFICATIONS ── */
-        .cert-provider-block { margin-bottom: 40px; }
+        /* Tooltip on hover */
+        .skill-pill::after {
+            content: attr(data-label);
+            position: absolute;
+            bottom: calc(100% + 8px);
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1c1e27;
+            border: 1px solid var(--border2);
+            color: var(--text);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.72rem;
+            white-space: nowrap;
+            padding: 4px 10px;
+            border-radius: 6px;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.15s;
+            z-index: 10;
+        }
+        .skill-pill:hover::after { opacity: 1; }
+
+        /* FA icons inside pills */
+        .skill-pill i {
+            font-size: 1.35rem;
+            line-height: 1;
+        }
+
+        /* Devicon img inside pills */
+        .skill-pill img {
+            width: 26px;
+            height: 26px;
+            object-fit: contain;
+        }
+
+        /* ══════════════════════════════════════════
+           CERTIFICATIONS — Credly Shield Badge Style
+        ══════════════════════════════════════════ */
+
+        /* Provider section */
+        .cert-provider-block { margin-bottom: 52px; }
         .cert-provider-block:last-child { margin-bottom: 0; }
 
         .cert-provider-header {
             display: flex;
             align-items: center;
             gap: 14px;
-            margin-bottom: 20px;
+            margin-bottom: 28px;
             padding-bottom: 14px;
             border-bottom: 1px solid var(--border);
         }
@@ -717,70 +756,156 @@
             border-radius: 20px;
         }
 
-        .certs-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-            gap: 14px;
-        }
-
-        .cert-card {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            padding: 18px 20px;
+        /* Badge grid */
+        .badges-grid {
             display: flex;
-            gap: 14px;
-            align-items: stretch;
-            text-decoration: none;
-            color: inherit;
-            transition: all 0.25s;
+            flex-wrap: wrap;
+            gap: 20px;
         }
-        .cert-card:hover {
-            border-color: var(--border2);
-            background: var(--card-hover);
-            transform: translateY(-2px);
-        }
-        .cert-icon {
-            width: 36px; height: 36px;
-            border-radius: 8px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 0.85rem;
-            flex-shrink: 0;
-        }
-        .ci-aws      { background: rgba(255,153,0,0.1);  border:1px solid rgba(255,153,0,0.2);  color:#ff9900; }
-        .ci-udemy    { background: rgba(161,43,217,0.1); border:1px solid rgba(161,43,217,0.2); color:#a12bd9; }
-        .ci-coursera { background: rgba(0,86,210,0.1);   border:1px solid rgba(0,86,210,0.2);   color:#0056d2; }
 
-        .cert-body {
+        /* The shield badge */
+        .cert-badge-wrap {
             display: flex;
             flex-direction: column;
-            flex: 1;
-        }
-        .cert-body strong {
-            display: block;
-            font-size: 0.88rem;
-            margin-bottom: 6px;
-            line-height: 1.4;
-            color: var(--text);
-        }
-        .cert-body span {
-            font-size: 0.75rem;
-            color: var(--muted);
-            font-family: 'Space Mono', monospace;
-            padding-bottom: 14px;
-        }
-        .cert-body .cert-badge {
-            display: inline-flex;
             align-items: center;
-            gap: 5px;
-            margin-top: auto;
-            padding-top: 12px;
-            border-top: 1px solid var(--border);
-            font-size: 0.68rem;
-            color: var(--accent);
-            font-family: 'Space Mono', monospace;
-            letter-spacing: 0.04em;
+            text-decoration: none;
+            color: inherit;
+            transition: transform 0.25s ease;
+            width: 148px;
+            flex-shrink: 0;
         }
+        .cert-badge-wrap:hover {
+            transform: translateY(-6px);
+        }
+
+        /* Pentagon/shield shape using clip-path */
+        .cert-shield {
+            width: 148px;
+            /* Height calculated so the 70% point gives a good aspect ratio */
+            height: 168px;
+            clip-path: polygon(0% 0%, 100% 0%, 100% 72%, 50% 100%, 0% 72%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 18px 12px 44px 12px; /* bottom pad for the taper zone */
+            position: relative;
+            transition: filter 0.25s;
+        }
+        .cert-badge-wrap:hover .cert-shield {
+            filter: brightness(1.12);
+        }
+
+        /* AWS shield */
+        .cert-shield-aws {
+            background: linear-gradient(160deg, #1a1428 0%, #0f1a2e 60%, #0a1828 100%);
+            border: 1px solid rgba(255,153,0,0.3);
+            /* Re-apply clip so border is inside */
+        }
+        /* We need the border to be visible on the shield — use a wrapper approach */
+        .cert-shield-aws::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            clip-path: polygon(0% 0%, 100% 0%, 100% 72%, 50% 100%, 0% 72%);
+            background: linear-gradient(160deg, rgba(255,153,0,0.18) 0%, transparent 60%);
+            pointer-events: none;
+        }
+
+        .cert-shield-udemy {
+            background: linear-gradient(160deg, #1a1028 0%, #1a0a28 60%, #150828 100%);
+            border: 1px solid rgba(161,43,217,0.3);
+        }
+        .cert-shield-udemy::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            clip-path: polygon(0% 0%, 100% 0%, 100% 72%, 50% 100%, 0% 72%);
+            background: linear-gradient(160deg, rgba(161,43,217,0.18) 0%, transparent 60%);
+            pointer-events: none;
+        }
+
+        .cert-shield-coursera {
+            background: linear-gradient(160deg, #0a1428 0%, #0a1a32 60%, #081428 100%);
+            border: 1px solid rgba(0,86,210,0.3);
+        }
+        .cert-shield-coursera::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            clip-path: polygon(0% 0%, 100% 0%, 100% 72%, 50% 100%, 0% 72%);
+            background: linear-gradient(160deg, rgba(0,86,210,0.18) 0%, transparent 60%);
+            pointer-events: none;
+        }
+
+        /* Logo area inside shield */
+        .shield-logo-area {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            margin-bottom: 10px;
+            flex-shrink: 0;
+            position: relative;
+            z-index: 1;
+        }
+        .sla-aws      { background: rgba(255,153,0,0.12);  border: 1.5px solid rgba(255,153,0,0.4); }
+        .sla-udemy    { background: rgba(161,43,217,0.12); border: 1.5px solid rgba(161,43,217,0.4); }
+        .sla-coursera { background: rgba(0,86,210,0.12);   border: 1.5px solid rgba(0,86,210,0.4); }
+
+        .shield-logo-area i {
+            font-size: 1.4rem;
+        }
+        .sla-aws i      { color: #ff9900; }
+        .sla-udemy i    { color: #a12bd9; }
+        .sla-coursera i { color: #0056d2; }
+
+        /* Cert title inside shield */
+        .shield-title {
+            font-size: 0.72rem;
+            font-weight: 600;
+            color: var(--text);
+            text-align: center;
+            line-height: 1.35;
+            position: relative;
+            z-index: 1;
+            /* Clamp to 3 lines max */
+            display: -webkit-box;
+            -webkit-line-clamp: 4;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            word-break: break-word;
+            hyphens: auto;
+        }
+
+        /* Provider label below shield */
+        .shield-provider-label {
+            margin-top: 10px;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.62rem;
+            letter-spacing: 0.06em;
+            text-align: center;
+            padding: 3px 10px;
+            border-radius: 4px;
+        }
+        .spl-aws      { color: #ff9900; background: rgba(255,153,0,0.07);  border: 1px solid rgba(255,153,0,0.2); }
+        .spl-udemy    { color: #a12bd9; background: rgba(161,43,217,0.07); border: 1px solid rgba(161,43,217,0.2); }
+        .spl-coursera { color: #0056d2; background: rgba(0,86,210,0.07);   border: 1px solid rgba(0,86,210,0.2); }
+
+        /* View link under label */
+        .shield-view {
+            margin-top: 6px;
+            font-size: 0.65rem;
+            color: var(--muted);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        .cert-badge-wrap:hover .shield-view { opacity: 1; }
 
         /* ── CONTACT ── */
         .contact-wrapper {
@@ -918,13 +1043,16 @@
             nav { padding: 0 20px; }
             .nav-links { display: none; }
             .hero { padding: 90px 24px 60px; }
-            .hero-inner { padding-right: 0; }            .hero-social { display: none; }
+            .hero-social { display: none; }
             .hero-stats { gap: 20px; flex-wrap: wrap; }
             section { padding: 70px 24px; }
             .about-grid { grid-template-columns: 1fr; gap: 36px; }
             .contact-wrapper { grid-template-columns: 1fr; gap: 36px; }
             footer { flex-direction: column; gap: 8px; text-align: center; padding: 24px; }
             .timeline { padding-left: 32px; }
+            .badges-grid { gap: 14px; }
+            .cert-badge-wrap { width: 128px; }
+            .cert-shield { width: 128px; height: 148px; }
         }
     </style>
 </head>
@@ -985,7 +1113,6 @@
             </div>
         </div>
 
-        <!-- Social icons — now fixed to left side, always visible -->
         <div class="hero-social">
             <a href="https://github.com/iaminaadhikari" target="_blank" title="GitHub"><i class="fab fa-github"></i></a>
             <a href="https://linkedin.com/in/ina-adhikari-555618311" target="_blank" title="LinkedIn"><i class="fab fa-linkedin"></i></a>
@@ -1148,84 +1275,154 @@
 
     <div class="full-divider"></div>
 
-    <!-- SKILLS -->
+    <!-- SKILLS — Icon only, tooltip on hover -->
     <section id="skills">
         <div class="section-label">What I use</div>
         <h2 class="section-title">Technical<br>Skills</h2>
         <div class="skills-wrapper">
 
+            <!-- FRONTEND -->
             <div class="skill-group fade-in">
                 <div class="skill-group-header">
                     <div class="skill-group-icon"><i class="fas fa-code"></i></div>
                     <div class="skill-group-title">Frontend</div>
                 </div>
                 <div class="skill-pills">
-                    <span class="skill-pill"><i class="fab fa-html5" style="color:#e34c26;"></i> HTML5</span>
-                    <span class="skill-pill"><i class="fab fa-css3-alt" style="color:#264de4;"></i> CSS3</span>
-                    <span class="skill-pill"><i class="fab fa-js" style="color:#f7df1e;"></i> JavaScript</span>
-                    <span class="skill-pill"><i class="fab fa-react" style="color:#61dafb;"></i> React.js</span>
-                    <span class="skill-pill"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon@v2.15.1/icons/nextjs/nextjs-original.svg" alt="Next.js"> Next.js</span>
-                    <span class="skill-pill"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon@v2.15.1/icons/flutter/flutter-original.svg" alt="Flutter"> Flutter</span>
-                    <span class="skill-pill"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon@v2.16.0/icons/tailwindcss/tailwindcss-original.svg" alt="Tailwind" style="filter:brightness(1.2);"> Tailwind CSS</span>
+                    <span class="skill-pill" data-label="HTML5">
+                        <i class="fab fa-html5" style="color:#e34c26;"></i>
+                    </span>
+                    <span class="skill-pill" data-label="CSS3">
+                        <i class="fab fa-css3-alt" style="color:#264de4;"></i>
+                    </span>
+                    <span class="skill-pill" data-label="JavaScript">
+                        <i class="fab fa-js" style="color:#f7df1e;"></i>
+                    </span>
+                    <span class="skill-pill" data-label="React.js">
+                        <i class="fab fa-react" style="color:#61dafb;"></i>
+                    </span>
+                    <span class="skill-pill" data-label="Next.js">
+                        <img src="https://cdn.jsdelivr.net/gh/devicons/devicon@v2.15.1/icons/nextjs/nextjs-original.svg" alt="Next.js">
+                    </span>
+                    <span class="skill-pill" data-label="Flutter">
+                        <img src="https://cdn.jsdelivr.net/gh/devicons/devicon@v2.15.1/icons/flutter/flutter-original.svg" alt="Flutter">
+                    </span>
+                    <span class="skill-pill" data-label="Tailwind CSS">
+                        <img src="https://cdn.jsdelivr.net/gh/devicons/devicon@v2.16.0/icons/tailwindcss/tailwindcss-original.svg" alt="Tailwind CSS">
+                    </span>
                 </div>
             </div>
 
+            <!-- BACKEND -->
             <div class="skill-group fade-in">
                 <div class="skill-group-header">
                     <div class="skill-group-icon"><i class="fas fa-server"></i></div>
                     <div class="skill-group-title">Backend &amp; Database</div>
                 </div>
                 <div class="skill-pills">
-                    <span class="skill-pill"><i class="fab fa-java" style="color:#ea2d2e;"></i> Java</span>
-                    <span class="skill-pill"><i class="fab fa-python" style="color:#3776ab;"></i> Python</span>
-                    <span class="skill-pill"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon@v2.15.1/icons/dotnetcore/dotnetcore-original.svg" alt=".NET"> .NET / ASP.NET</span>
-                    <span class="skill-pill"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon@v2.15.1/icons/csharp/csharp-original.svg" alt="C#"> C#</span>
-                    <span class="skill-pill"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon@v2.15.1/icons/dart/dart-original.svg" alt="Dart"> Dart</span>
-                    <span class="skill-pill"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon@v2.15.1/icons/mysql/mysql-original.svg" alt="SQL"> SQL</span>
+                    <span class="skill-pill" data-label="Java">
+                        <i class="fab fa-java" style="color:#ea2d2e;"></i>
+                    </span>
+                    <span class="skill-pill" data-label="Python">
+                        <i class="fab fa-python" style="color:#3776ab;"></i>
+                    </span>
+                    <span class="skill-pill" data-label=".NET / ASP.NET">
+                        <img src="https://cdn.jsdelivr.net/gh/devicons/devicon@v2.15.1/icons/dotnetcore/dotnetcore-original.svg" alt=".NET">
+                    </span>
+                    <span class="skill-pill" data-label="C#">
+                        <img src="https://cdn.jsdelivr.net/gh/devicons/devicon@v2.15.1/icons/csharp/csharp-original.svg" alt="C#">
+                    </span>
+                    <span class="skill-pill" data-label="Dart">
+                        <img src="https://cdn.jsdelivr.net/gh/devicons/devicon@v2.15.1/icons/dart/dart-original.svg" alt="Dart">
+                    </span>
+                    <span class="skill-pill" data-label="SQL">
+                        <img src="https://cdn.jsdelivr.net/gh/devicons/devicon@v2.15.1/icons/mysql/mysql-original.svg" alt="SQL">
+                    </span>
                 </div>
             </div>
 
+            <!-- DESIGN -->
             <div class="skill-group fade-in">
                 <div class="skill-group-header">
                     <div class="skill-group-icon"><i class="fas fa-pen-ruler"></i></div>
                     <div class="skill-group-title">Design &amp; Prototyping</div>
                 </div>
                 <div class="skill-pills">
-                    <span class="skill-pill"><i class="fab fa-figma" style="color:#a259ff;"></i> Figma</span>
-                    <span class="skill-pill"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon@v2.15.1/icons/xd/xd-plain.svg" alt="Adobe XD"> Adobe XD</span>
-                    <span class="skill-pill"><i class="fas fa-sticky-note" style="color:#ffd02f;"></i> Miro</span>
-                    <span class="skill-pill"><i class="fas fa-palette" style="color:#00c4cc;"></i> Canva</span>
-                    <span class="skill-pill"><i class="fas fa-vector-square" style="color:var(--accent2);"></i> Wireframing</span>
-                    <span class="skill-pill"><i class="fas fa-layer-group" style="color:var(--accent3);"></i> Prototyping</span>
+                    <span class="skill-pill" data-label="Figma">
+                        <i class="fab fa-figma" style="color:#a259ff;"></i>
+                    </span>
+                    <span class="skill-pill" data-label="Adobe XD">
+                        <img src="https://cdn.jsdelivr.net/gh/devicons/devicon@v2.15.1/icons/xd/xd-plain.svg" alt="Adobe XD">
+                    </span>
+                    <span class="skill-pill" data-label="Miro">
+                        <!-- Miro: sticky note board icon -->
+                        <i class="fas fa-chalkboard" style="color:#ffd02f;"></i>
+                    </span>
+                    <span class="skill-pill" data-label="Canva">
+                        <i class="fas fa-palette" style="color:#00c4cc;"></i>
+                    </span>
+                    <span class="skill-pill" data-label="Wireframing">
+                        <!-- Wireframing: pencil-ruler icon -->
+                        <i class="fas fa-pencil-ruler" style="color:#7b61ff;"></i>
+                    </span>
+                    <span class="skill-pill" data-label="Prototyping">
+                        <!-- Prototyping: object-group icon -->
+                        <i class="fas fa-object-group" style="color:#ff6b6b;"></i>
+                    </span>
                 </div>
             </div>
 
+            <!-- TOOLS -->
             <div class="skill-group fade-in">
                 <div class="skill-group-header">
                     <div class="skill-group-icon"><i class="fas fa-toolbox"></i></div>
                     <div class="skill-group-title">Tools &amp; Collaboration</div>
                 </div>
                 <div class="skill-pills">
-                    <span class="skill-pill"><i class="fab fa-git-alt" style="color:#f34f29;"></i> Git</span>
-                    <span class="skill-pill"><i class="fab fa-github" style="color:#e8eaf0;"></i> GitHub</span>
-                    <span class="skill-pill"><i class="fab fa-trello" style="color:#0079bf;"></i> Trello</span>
-                    <span class="skill-pill"><i class="fab fa-slack" style="color:#4a154b;"></i> Slack</span>
-                    <span class="skill-pill"><i class="fas fa-film" style="color:#9ca3af;"></i> Premiere Pro</span>
-                    <span class="skill-pill"><i class="fas fa-wand-magic-sparkles" style="color:#fbbf24;"></i> DaVinci Resolve</span>
+                    <span class="skill-pill" data-label="Git">
+                        <i class="fab fa-git-alt" style="color:#f34f29;"></i>
+                    </span>
+                    <span class="skill-pill" data-label="GitHub">
+                        <i class="fab fa-github" style="color:#e8eaf0;"></i>
+                    </span>
+                    <span class="skill-pill" data-label="Trello">
+                        <i class="fab fa-trello" style="color:#0079bf;"></i>
+                    </span>
+                    <span class="skill-pill" data-label="Slack">
+                        <i class="fab fa-slack" style="color:#4a154b;"></i>
+                    </span>
+                    <span class="skill-pill" data-label="Premiere Pro">
+                        <!-- Premiere Pro: film strip icon -->
+                        <i class="fas fa-film" style="color:#9999ff;"></i>
+                    </span>
+                    <span class="skill-pill" data-label="DaVinci Resolve">
+                        <!-- DaVinci: color wheel / wand icon -->
+                        <i class="fas fa-wand-magic-sparkles" style="color:#fbbf24;"></i>
+                    </span>
                 </div>
             </div>
 
+            <!-- SOFT SKILLS -->
             <div class="skill-group fade-in">
                 <div class="skill-group-header">
                     <div class="skill-group-icon"><i class="fas fa-user-gear"></i></div>
                     <div class="skill-group-title">Soft Skills</div>
                 </div>
                 <div class="skill-pills">
-                    <span class="skill-pill"><i class="fas fa-lightbulb" style="color:#fbbf24;"></i> Creative Problem Solving</span>
-                    <span class="skill-pill"><i class="fas fa-users" style="color:var(--accent);"></i> Team Collaboration</span>
-                    <span class="skill-pill"><i class="fas fa-comments" style="color:var(--accent2);"></i> Communication</span>
-                    <span class="skill-pill"><i class="fas fa-magnifying-glass" style="color:var(--accent4);"></i> Attention to Detail</span>
-                    <span class="skill-pill"><i class="fas fa-rotate" style="color:#4ade80;"></i> Adaptability</span>
+                    <span class="skill-pill" data-label="Creative Problem Solving">
+                        <i class="fas fa-lightbulb" style="color:#fbbf24;"></i>
+                    </span>
+                    <span class="skill-pill" data-label="Team Collaboration">
+                        <i class="fas fa-users" style="color:#c8f03a;"></i>
+                    </span>
+                    <span class="skill-pill" data-label="Communication">
+                        <i class="fas fa-comments" style="color:#7b61ff;"></i>
+                    </span>
+                    <span class="skill-pill" data-label="Attention to Detail">
+                        <i class="fas fa-magnifying-glass" style="color:#38bdf8;"></i>
+                    </span>
+                    <span class="skill-pill" data-label="Adaptability">
+                        <i class="fas fa-rotate" style="color:#4ade80;"></i>
+                    </span>
                 </div>
             </div>
 
@@ -1288,86 +1485,98 @@
 
     <div class="full-divider"></div>
 
-    <!-- CERTIFICATIONS -->
+    <!-- CERTIFICATIONS — Credly-style shield badges -->
     <section id="certifications">
         <div class="section-label">Credentials</div>
         <h2 class="section-title">Certifications</h2>
 
+        <!-- AWS -->
         <div class="cert-provider-block fade-in">
             <div class="cert-provider-header">
                 <div class="cert-provider-logo cert-logo-aws"><i class="fab fa-aws"></i></div>
                 <div class="cert-provider-name">Amazon Web Services</div>
                 <div class="cert-provider-count">4 certifications</div>
             </div>
-            <div class="certs-grid">
-                <a href="https://www.credly.com/badges/95410a51-f696-43b2-a756-afbe87b0628e/public_url" target="_blank" class="cert-card">
-                    <div class="cert-icon ci-aws"><i class="fas fa-database"></i></div>
-                    <div class="cert-body">
-                        <strong>AWS Academy Data Engineering</strong>
-                        <span>AWS Academy</span>
-                        <div class="cert-badge"><i class="fas fa-external-link"></i> View on Credly</div>
+            <div class="badges-grid">
+
+                <a href="https://www.credly.com/badges/95410a51-f696-43b2-a756-afbe87b0628e/public_url" target="_blank" class="cert-badge-wrap">
+                    <div class="cert-shield cert-shield-aws">
+                        <div class="shield-logo-area sla-aws"><i class="fab fa-aws"></i></div>
+                        <div class="shield-title">AWS Academy Data Engineering</div>
                     </div>
+                    <span class="shield-provider-label spl-aws">AWS Academy</span>
+                    <span class="shield-view"><i class="fas fa-external-link-alt"></i> View</span>
                 </a>
-                <a href="https://www.credly.com/badges/9c88cc03-ed49-4fe1-a5c7-37ee6cc38da7/public_url" target="_blank" class="cert-card">
-                    <div class="cert-icon ci-aws"><i class="fas fa-robot"></i></div>
-                    <div class="cert-body">
-                        <strong>AWS Academy Machine Learning Foundations</strong>
-                        <span>AWS Academy</span>
-                        <div class="cert-badge"><i class="fas fa-external-link"></i> View on Credly</div>
+
+                <a href="https://www.credly.com/badges/9c88cc03-ed49-4fe1-a5c7-37ee6cc38da7/public_url" target="_blank" class="cert-badge-wrap">
+                    <div class="cert-shield cert-shield-aws">
+                        <div class="shield-logo-area sla-aws"><i class="fab fa-aws"></i></div>
+                        <div class="shield-title">AWS Academy Machine Learning Foundations</div>
                     </div>
+                    <span class="shield-provider-label spl-aws">AWS Academy</span>
+                    <span class="shield-view"><i class="fas fa-external-link-alt"></i> View</span>
                 </a>
-                <a href="https://www.credly.com/badges/b8837db7-83de-4abe-bd82-80467acf9c1b/public_url" target="_blank" class="cert-card">
-                    <div class="cert-icon ci-aws"><i class="fas fa-cloud"></i></div>
-                    <div class="cert-body">
-                        <strong>AWS Academy Cloud Foundations</strong>
-                        <span>AWS Academy</span>
-                        <div class="cert-badge"><i class="fas fa-external-link"></i> View on Credly</div>
+
+                <a href="https://www.credly.com/badges/b8837db7-83de-4abe-bd82-80467acf9c1b/public_url" target="_blank" class="cert-badge-wrap">
+                    <div class="cert-shield cert-shield-aws">
+                        <div class="shield-logo-area sla-aws"><i class="fab fa-aws"></i></div>
+                        <div class="shield-title">AWS Academy Cloud Foundations</div>
                     </div>
+                    <span class="shield-provider-label spl-aws">AWS Academy</span>
+                    <span class="shield-view"><i class="fas fa-external-link-alt"></i> View</span>
                 </a>
-                <a href="https://www.credly.com/badges/7f9ba3d6-dc20-4459-8c77-9c4e2034e855/public_url" target="_blank" class="cert-card">
-                    <div class="cert-icon ci-aws"><i class="fas fa-comment-dots"></i></div>
-                    <div class="cert-body">
-                        <strong>AWS Academy ML for Natural Language Processing</strong>
-                        <span>AWS Academy</span>
-                        <div class="cert-badge"><i class="fas fa-external-link"></i> View on Credly</div>
+
+                <a href="https://www.credly.com/badges/7f9ba3d6-dc20-4459-8c77-9c4e2034e855/public_url" target="_blank" class="cert-badge-wrap">
+                    <div class="cert-shield cert-shield-aws">
+                        <div class="shield-logo-area sla-aws"><i class="fab fa-aws"></i></div>
+                        <div class="shield-title">AWS Academy ML for NLP</div>
                     </div>
+                    <span class="shield-provider-label spl-aws">AWS Academy</span>
+                    <span class="shield-view"><i class="fas fa-external-link-alt"></i> View</span>
                 </a>
+
             </div>
         </div>
 
+        <!-- Udemy -->
         <div class="cert-provider-block fade-in">
             <div class="cert-provider-header">
                 <div class="cert-provider-logo cert-logo-udemy"><i class="fas fa-graduation-cap"></i></div>
                 <div class="cert-provider-name">Udemy</div>
                 <div class="cert-provider-count">1 certification</div>
             </div>
-            <div class="certs-grid">
-                <a href="https://www.udemy.com/certificate/" target="_blank" class="cert-card">
-                    <div class="cert-icon ci-udemy"><i class="fas fa-mobile-screen"></i></div>
-                    <div class="cert-body">
-                        <strong>Cross-Platform Mobile Apps with Flutter &amp; Dart</strong>
-                        <span>Udemy</span>
-                        <div class="cert-badge"><i class="fas fa-external-link"></i> View Certificate</div>
+            <div class="badges-grid">
+
+                <a href="https://www.udemy.com/certificate/" target="_blank" class="cert-badge-wrap">
+                    <div class="cert-shield cert-shield-udemy">
+                        <div class="shield-logo-area sla-udemy"><i class="fas fa-graduation-cap"></i></div>
+                        <div class="shield-title">Flutter &amp; Dart Cross-Platform Mobile Apps</div>
                     </div>
+                    <span class="shield-provider-label spl-udemy">Udemy</span>
+                    <span class="shield-view"><i class="fas fa-external-link-alt"></i> View</span>
                 </a>
+
             </div>
         </div>
 
+        <!-- Coursera -->
         <div class="cert-provider-block fade-in">
             <div class="cert-provider-header">
                 <div class="cert-provider-logo cert-logo-coursera"><i class="fas fa-book-open"></i></div>
                 <div class="cert-provider-name">Coursera</div>
                 <div class="cert-provider-count">1 certification</div>
             </div>
-            <div class="certs-grid">
-                <a href="https://www.coursera.org/search?query=data+structures+algorithms" target="_blank" class="cert-card">
-                    <div class="cert-icon ci-coursera"><i class="fas fa-sitemap"></i></div>
-                    <div class="cert-body">
-                        <strong>Data Structures and Algorithms</strong>
-                        <span>Coursera</span>
-                        <div class="cert-badge"><i class="fas fa-external-link"></i> View Certificate</div>
+            <div class="badges-grid">
+
+                <a href="https://www.coursera.org/search?query=data+structures+algorithms" target="_blank" class="cert-badge-wrap">
+                    <div class="cert-shield cert-shield-coursera">
+                        <div class="shield-logo-area sla-coursera"><i class="fas fa-sitemap"></i></div>
+                        <div class="shield-title">Data Structures and Algorithms</div>
                     </div>
+                    <span class="shield-provider-label spl-coursera">Coursera</span>
+                    <span class="shield-view"><i class="fas fa-external-link-alt"></i> View</span>
                 </a>
+
             </div>
         </div>
 
@@ -1421,6 +1630,7 @@
     </a>
 
     <script>
+        /* ── CUSTOM CURSOR ── */
         const cur   = document.getElementById('cursor');
         const curRing = document.getElementById('cursor-ring');
         let mx=0, my=0, rx=0, ry=0;
@@ -1436,18 +1646,19 @@
         }
         animCursor();
 
+        /* ── SCROLL PROGRESS + BACK TO TOP ── */
         const prog = document.getElementById('scroll-progress');
         const backTop = document.getElementById('back-top');
         window.addEventListener('scroll', () => {
             const total = document.documentElement.scrollHeight - window.innerHeight;
             const pct   = (window.scrollY / total) * 100;
             prog.style.width = pct + '%';
-            if(window.scrollY > 400) backTop.classList.add('visible');
-            else                     backTop.classList.remove('visible');
+            backTop.classList.toggle('visible', window.scrollY > 400);
         });
 
+        /* ── FADE-IN ON SCROLL ── */
         const observer = new IntersectionObserver((entries) => {
-            entries.forEach((entry, i) => {
+            entries.forEach((entry) => {
                 if(entry.isIntersecting){
                     setTimeout(() => entry.target.classList.add('visible'), (entry.target.dataset.delay || 0));
                     observer.unobserve(entry.target);
@@ -1460,6 +1671,7 @@
             observer.observe(el);
         });
 
+        /* ── ACTIVE NAV LINK ── */
         const sections  = document.querySelectorAll('section[id]');
         const navLinks  = document.querySelectorAll('.nav-links a');
         window.addEventListener('scroll', () => {
@@ -1472,6 +1684,7 @@
             });
         });
 
+        /* ── COUNTER ANIMATION ── */
         function animCount(el){
             const target = parseInt(el.dataset.target);
             let cur = 0;
@@ -1494,6 +1707,7 @@
 
         document.querySelectorAll('.hero-stat-num[data-target]').forEach(el => counterObserver.observe(el));
 
+        /* ── BACK TO TOP ── */
         backTop.addEventListener('click', e => {
             e.preventDefault();
             window.scrollTo({ top: 0, behavior: 'smooth' });
